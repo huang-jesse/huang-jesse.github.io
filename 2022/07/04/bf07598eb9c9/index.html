@@ -8,17 +8,18 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/me/index.html">Me</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>线段树</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract"><h1 id="线段树"><a href="#线段树" class="headerlink" title="线段树"></a>线段树</h1><p><a target="_blank" rel="noopener" href="https://oi-wiki.org/ds/seg/">线段树-原文</a></p>
-<p><strong>线段树</strong>（英语：Segment tree）是一种<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/二元樹">二元树</a>形资料结构，1977年由Jon Louis Bentley发明<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/線段樹#cite_note-Schwarzkopf4-1">[1]</a>，用以储存<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/區間">区间</a>或<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/線段">线段</a>，并且允许快速查询结构内包含某一点的所有区间。</p>
+<p><strong>线段树</strong>（英语：Segment tree）是一种<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%85%83%E6%A8%B9">二元树</a>形资料结构，1977年由Jon Louis Bentley发明[<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/%E7%B7%9A%E6%AE%B5%E6%A8%B9#cite_note-Schwarzkopf4-1">1]</a>，用以储存<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%8D%80%E9%96%93">区间</a>或<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%B7%9A%E6%AE%B5">线段</a>，并且允许快速查询结构内包含某一点的所有区间。</p>
 <p>线段树，空间复杂度为 $O(n)$ ；可以在  $O(\log n)$  的时间复杂度内实现单点修改、区间修改、区间查询（区间求和，求区间最大值，求区间最小值）等操作。</p>
 <h2 id="线段树的基本结构与建树"><a href="#线段树的基本结构与建树" class="headerlink" title="线段树的基本结构与建树"></a>线段树的基本结构与建树</h2><p>线段树将每个长度不为 的区间划分成左右两个区间递归求解，把整个线段划分为一个树形结构，通过合并左右两区间信息来求得该区间的信息。这种数据结构可以方便的进行大部分的区间操作。</p>
-<p>有个大小为 $5$ 的数组 <code>a = &#123;10,11,12,13,14&#125;​</code> ，要将其转化为线段树，有以下做法：设线段树的根节点编号为 $1$ ，用数组 $d$ 来保存我们的线段树，$d_i$ 用来保存线段树上编号为 $i$ 的节点的值（这里每个节点所维护的值就是这个节点所表示的<strong>区间总和</strong>）。</p>
+<p>有个大小为 $5$ 的数组 <code>a = &#123;10,11,12,13,14&#125;</code> ，要将其转化为线段树，有以下做法：设线段树的根节点编号为 $1$ ，用数组 $d$ 来保存我们的线段树，$d_i$ 用来保存线段树上编号为 $i$ 的节点的值（这里每个节点所维护的值就是这个节点所表示的<strong>区间总和</strong>）。</p>
 <p>我们先给出这棵线段树的形态，如图所示：</p>
-<p><img src="%E7%BA%BF%E6%AE%B5%E6%A0%91.assets/image-20220824163302928.png" alt="image-20220824163302928" style="zoom: 33%;" /></p>
-<p>图中每个节点中用红色字体标明的区间，表示该节点管辖的 $a$ 数组上的位置区间。如 $d_1$ 所管辖的区间就是 $[1,5] (a_1,a_2,\cdots,a_5)$，即 $d_1$ 所保存的值是$a_1 + a_2 + \cdots + a_5$， $d_1 = 60$ 表示的是 $a_1 + a_2 + \cdots + a_5 = 60$。</p>
-<p>通过观察不难发现， $d<em>i$ 的左儿子节点就是 $d</em>{2 \times i}$， $d<em>i$ 的右儿子节点就是 $d</em>{2 \times i + 1}$。如果 $d<em>i$ 表示的是区间 $[s,t]$（即 $d_i = a_l + a</em>{l+1} + \cdots + a_r$ ) 的话，那么 $d_i$ 的左儿子节点表示的是区间 $[s,\frac{s+t}{2}]$， $d_i$ 的右儿子表示的是区间 $[\frac{s+t}{2}+1, t]$。</p>
-<p>在实现时，我们考虑递归建树。设当前的根节点为 $p$，如果根节点管辖的区间长度已经是 $1$ （即 $s=t$），则可以直接根据 $a$ 数组上相应位置的值初始化该节点。否则我们将该区间从中点处分割为两个子区间，分别进入左右子节点递归建树，最后合并两个子节点的信息。</p>
+<img src="https://luoochen.github.io/2022/07/04/bf07598eb9c9/image-20220824163302928.png" alt="image-20220824163302928" style="zoom: 33%;">
+
+<p>图中每个节点中用红色字体标明的区间，表示该节点管辖的 $a$ 数组上的位置区间。如 $d_1$ 所管辖的区间就是 $[1,5] (a_1,a_2,\cdots,a_5)$，即 $d_1$ 所保存的值是$a_1 + a_2 + \cdots + a_5$， $d_1 &#x3D; 60$ 表示的是 $a_1 + a_2 + \cdots + a_5 &#x3D; 60$。</p>
+<p>通过观察不难发现， $d_i$ 的左儿子节点就是 $d_{2 \times i}$， $d_i$ 的右儿子节点就是 $d_{2 \times i + 1}$。如果 $d_i$ 表示的是区间 $[s,t]$（即 $d_i &#x3D; a_l + a_{l+1} + \cdots + a_r$ ) 的话，那么 $d_i$ 的左儿子节点表示的是区间 $[s,\frac{s+t}{2}]$， $d_i$ 的右儿子表示的是区间 $[\frac{s+t}{2}+1, t]$。</p>
+<p>在实现时，我们考虑递归建树。设当前的根节点为 $p$，如果根节点管辖的区间长度已经是 $1$ （即 $s&#x3D;t$），则可以直接根据 $a$ 数组上相应位置的值初始化该节点。否则我们将该区间从中点处分割为两个子区间，分别进入左右子节点递归建树，最后合并两个子节点的信息。</p>
 <p><strong>构建线段树的代码实现：</strong></p>
-<pre class="line-numbers language-lang-Java"><code class="language-lang-Java">/**
+<pre class="line-numbers language-Java"><code class="language-Java">/**
  * 递归构建线段树
  * @param s 当前节点左边界
  * @param t 当前节点右边界
@@ -40,13 +41,14 @@ private void build(int s, int t, int p) &#123;
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>关于线段树的空间</strong>：如果采用堆式存储（ $2p$ 是 $p$ 的左儿子，$2p + 1$ 是 $p$ 的右儿子），若有 $n$ 个叶子结点，则 $d$ 数组的范围最大为 $2^{\lceil \log{n} \rceil + 1}$。<strong>（可以直接设置 $d$ 数组长度为 $4n$ ）</strong></p>
 <p>分析：容易知道线段树的深度是 $\lceil \log{n} \rceil$ 的，则在堆式储存情况下叶子节点（包括无用的叶子节点）数量为 $2^{\lceil \log{n} \rceil}$个 ，又由于其为一棵完全二叉树，则其总节点个数 $2^{\lceil \log{n} \rceil + 1} - 1$。当然如果你懒得计算的话可以直接把数组长度设为 $4n$。</p>
-<h2 id="线段树的区间查询"><a href="#线段树的区间查询" class="headerlink" title="线段树的区间查询"></a>线段树的区间查询</h2><p>区间查询，比如求区间 $[l,r]$ 的总和（即 $a<em>l + a</em>{l+1} + \cdots + a_r$）、求区间最大值/最小值等操作。</p>
-<p><img src="%E7%BA%BF%E6%AE%B5%E6%A0%91.assets/image-20220824163302928.png" alt="image-20220824163302928" style="zoom: 33%;" /></p>
+<h2 id="线段树的区间查询"><a href="#线段树的区间查询" class="headerlink" title="线段树的区间查询"></a>线段树的区间查询</h2><p>区间查询，比如求区间 $[l,r]$ 的总和（即 $a_l + a_{l+1} + \cdots + a_r$）、求区间最大值&#x2F;最小值等操作。</p>
+<img src="https://luoochen.github.io/2022/07/04/bf07598eb9c9/image-20220824163302928.png" alt="image-20220824163302928" style="zoom: 33%;">
+
 <p>仍然以最开始的图为例，如果要查询区间 $[1,5]$ 的和，那直接获取 $d_1$ 的值（$60$）即可。</p>
 <p>如果要查询的区间为 $[3,5]$，此时就不能直接获取区间的值，但是 $[3,5]$ 可以拆成 $[3,3]$ 和 $[4,5]$，可以通过合并这两个区间的答案来求得这个区间的答案。</p>
 <p>一般地，如果要查询的区间是 $[l,r]$，则可以将其拆成最多为 $O(\log{n})$ 个 <strong>极大</strong> 的区间，合并这些区间即可求出 $[l,r]$ 的答案。</p>
 <p><strong>区间查询代码实现：</strong></p>
-<pre class="line-numbers language-lang-Java"><code class="language-lang-Java">/**
+<pre class="line-numbers language-Java"><code class="language-Java">/**
  * 获取区间 [l,r] 的总和
  * @param l 查询区间左边界
  * @param r 查询区间右边界
@@ -78,18 +80,21 @@ private int getSum(int l, int r, int s, int t, int p) &#123;
 <p>懒惰标记，简单来说，就是通过延迟对节点信息的更改，从而减少可能不必要的操作次数。每次执行修改时，我们通过打标记的方法表明该节点对应的区间在某一次操作中被更改，但不更新该节点的子节点的信息。实质性的修改则在下一次访问带有标记的节点时才进行。</p>
 <p>仍然以最开始的图为例，我们将执行若干次给区间内的数加上一个值的操作。我们现在给每个节点增加一个 $m_i$ ，表示该节点带的标记值。</p>
 <p>最开始时的情况是这样的（为了节省空间，这里不再展示每个节点管辖的区间）：</p>
-<p><img src="%E7%BA%BF%E6%AE%B5%E6%A0%91.assets/image-20220820153727547.png" alt="image-20220820153727547" style="zoom:50%;" /></p>
+<img src="https://luoochen.github.io/2022/07/04/bf07598eb9c9/image-20220820153727547.png" alt="image-20220820153727547" style="zoom:50%;">
+
 <p><strong>现在我们准备给 $[3,5]$上的每个数都加上 $5$ 。</strong>根据前面区间查询的经验，我们很快找到了两个极大区间 $[3,3]$ 和 $[4,5]$ （分别对应线段树上的 $3$ 号点和 $5$ 号点）。</p>
 <p>我们直接在这两个节点上进行修改，并给它们打上标记(红色字体为实际更新部分)：</p>
-<p><img src="%E7%BA%BF%E6%AE%B5%E6%A0%91.assets/image-20220820154135276.png" alt="image-20220820154135276" style="zoom:50%;" /></p>
-<p>我们发现， $3$ 号节点及其根节点的信息虽然被修改了（因为该区间管辖两个数，所以 $d_3$ 加上的数是 $5 \times 2 = 10$ ），但它的两个子节点却还没更新，仍然保留着修改之前的信息。不过不用担心，虽然修改目前还没进行，但当我们要查询这两个子节点的信息时，我们会利用标记修改这两个子节点的信息，使查询的结果依旧准确。</p>
+<img src="https://luoochen.github.io/2022/07/04/bf07598eb9c9/image-20220820154135276.png" alt="image-20220820154135276" style="zoom:50%;">
+
+<p>我们发现， $3$ 号节点及其根节点的信息虽然被修改了（因为该区间管辖两个数，所以 $d_3$ 加上的数是 $5 \times 2 &#x3D; 10$ ），但它的两个子节点却还没更新，仍然保留着修改之前的信息。不过不用担心，虽然修改目前还没进行，但当我们要查询这两个子节点的信息时，我们会利用标记修改这两个子节点的信息，使查询的结果依旧准确。</p>
 <p><strong>接下来我们查询一下 $[4,4]$ 区间上各数字的和</strong>。</p>
 <p>我们通过递归找到 $[4,5]$ 区间，发现该区间并非我们的目标区间，且该区间上还存在标记。这时候就到标记下放的时间了。我们将该区间的两个子区间的信息更新，并清除该区间上的标记。</p>
-<p><img src="%E7%BA%BF%E6%AE%B5%E6%A0%91.assets/image-20220820155037228.png" alt="image-20220820155037228" style="zoom: 67%;" /></p>
+<img src="https://luoochen.github.io/2022/07/04/bf07598eb9c9/image-20220820155037228.png" alt="image-20220820155037228" style="zoom: 67%;">
+
 <p>现在 $6$ , $7$ 两个节点的值变成了最新的值，查询的结果也是准确的。</p>
 <p>接下来给出在存在标记的情况下，区间修改和查询操作的参考实现。</p>
 <p><strong>区间修改（区间加上某个值）代码实现：</strong></p>
-<pre class="line-numbers language-lang-Java"><code class="language-lang-Java">/**
+<pre class="line-numbers language-Java"><code class="language-Java">/**
  * 针对区间 [l,r] 的每一项加上某值 c （懒标记）
  * @param l 修改区间左边界
  * @param r 修改区间右边界
@@ -134,7 +139,7 @@ public void update(int l, int r, int c, int s, int t, int p) &#123;
 &#125;
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>区间查询（区间求和）代码实现：</strong></p>
-<pre class="line-numbers language-lang-Java"><code class="language-lang-Java">/**
+<pre class="line-numbers language-Java"><code class="language-Java">/**
  * 获取区间 [l,r] 的总和
  * @param l 查询区间左边界
  * @param r 查询区间右边界
@@ -182,4 +187,4 @@ public int getSum(int l, int r, int s, int t, int p) &#123;
 <li>下放懒惰标记可以写一个专门的函数 <code>pushdown</code>，从儿子节点更新当前节点也可以写一个专门的函数 <code>maintain</code>（或者对称地用 <code>pushup</code>），降低代码编写难度。</li>
 <li>标记永久化：如果确定懒惰标记不会在中途被加到溢出（即超过了该类型数据所能表示的最大范围），那么就可以将标记永久化。标记永久化可以避免下传懒惰标记，只需在进行询问时把标记的影响加到答案当中，从而降低程序常数。具体如何处理与题目特性相关，需结合题目来写。这也是树套树和可持久化数据结构中会用到的一种技巧</li>
 </ul>
-</p></div><div class="share"><span>Share</span>&nbsp;<span class="soc"><a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank" class="fa fa-bookmark"></a></span><span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2022/07/04/bf07598eb9c9/%20风吹流年远%20线段树" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2022/07/04/874b2383dc4b/" title="跳表"><i class="fa fa-angle-double-left"></i>&nbsp;Previous post: 跳表</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2021/07/04/4db3a9983678/" title="位运算">Next post: 位运算&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
+</p></div><div class="share"><span>Share</span>&nbsp;<span class="soc"><a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank" class="fa fa-bookmark"></a></span><span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2022/07/04/bf07598eb9c9/%20风吹流年远%20线段树" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2022/07/04/3b1471531eae/" title="并查集"><i class="fa fa-angle-double-left"></i>&nbsp;Previous post: 并查集</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2022/07/04/cf992e4068fd/" title="跳表">Next post: 跳表&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
