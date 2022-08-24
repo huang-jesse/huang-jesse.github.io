@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>风吹流年远</title>
+  
+  <subtitle>Time went by</subtitle>
+  <link href="https://luoochen.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://luoochen.github.io/"/>
+  <updated>2022-08-23T11:42:13.752Z</updated>
+  <id>https://luoochen.github.io/</id>
+  
+  <author>
+    <name>Luoo</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://luoochen.github.io/2022/08/23/87178ab5d221/"/>
+    <id>https://luoochen.github.io/2022/08/23/87178ab5d221/</id>
+    <published>2022-08-23T11:42:13.752Z</published>
+    <updated>2022-08-23T11:42:13.752Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>并查集</title>
+    <link href="https://luoochen.github.io/2022/07/04/3b1471531eae/"/>
+    <id>https://luoochen.github.io/2022/07/04/3b1471531eae/</id>
+    <published>2022-07-04T11:17:00.000Z</published>
+    <updated>2022-08-24T11:31:11.952Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;并查集-Disjoint-set-data-structure-x2F-Union-find-data-structure&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    
+    <category term="数据结构" scheme="https://luoochen.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>跳表</title>
+    <link href="https://luoochen.github.io/2022/07/04/874b2383dc4b/"/>
+    <id>https://luoochen.github.io/2022/07/04/874b2383dc4b/</id>
+    <published>2022-07-04T11:17:00.000Z</published>
+    <updated>2022-08-24T08:36:14.265Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;跳表（SkipList）&quot;&gt;&lt;a href=&quot;#跳表（SkipList）&quot; class=&quot;headerlink&quot; title=&quot;跳表（SkipList）&quot;&gt;&lt;/a&gt;跳表（SkipList）&lt;/h1&gt;&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    
+    <category term="数据结构" scheme="https://luoochen.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>线段树</title>
+    <link href="https://luoochen.github.io/2022/07/04/bf07598eb9c9/"/>
+    <id>https://luoochen.github.io/2022/07/04/bf07598eb9c9/</id>
+    <published>2022-07-04T11:17:00.000Z</published>
+    <updated>2022-08-24T08:35:42.568Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;线段树&quot;&gt;&lt;a href=&quot;#线段树&quot; class=&quot;headerlink&quot; title=&quot;线段树&quot;&gt;&lt;/a&gt;线段树&lt;/h1&gt;&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    
+    <category term="数据结构" scheme="https://luoochen.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>位运算</title>
+    <link href="https://luoochen.github.io/2021/07/04/4db3a9983678/"/>
+    <id>https://luoochen.github.io/2021/07/04/4db3a9983678/</id>
+    <published>2021-07-04T11:17:00.000Z</published>
+    <updated>2022-08-23T11:42:13.752Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;概念&quot;&gt;&lt;a href=&quot;#概念&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    
+    <category term="位运算" scheme="https://luoochen.github.io/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>书单</title>
+    <link href="https://luoochen.github.io/2021/06/26/2d0baa0a50bf/"/>
+    <id>https://luoochen.github.io/2021/06/26/2d0baa0a50bf/</id>
+    <published>2021-06-26T07:45:48.000Z</published>
+    <updated>2022-08-23T11:42:13.752Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;如何学习&quot;&gt;&lt;a href=&quot;#如何学习&quot; class=&quot;headerlink&quot; title=&quot;如何学习&quot;&gt;&lt;/a&gt;如何学习&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;[ ] 学习之道（A Mind for Numbers）芭芭拉·奥克利（Barbara</summary>
+        
+      
+    
+    
+    
+    <category term="Books" scheme="https://luoochen.github.io/categories/Books/"/>
+    
+    
+    <category term="Read" scheme="https://luoochen.github.io/tags/Read/"/>
+    
+  </entry>
+  
+</feed>
