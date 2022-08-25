@@ -1,16 +1,146 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>风吹流年远</title><meta name="description" content="A Blog Powered By Hexo"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/" class="current">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-container"><p class="post-title"><a href="/2022/07/04/3b1471531eae/">并查集</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract">并查集(Disjoint-set data structure/Union-find data structure)并查集-wiki
-概念在计算机科学中，并查集（英文：Disjoint-set data structure，直译为不交集数据结构）是一种数据结构，用于处理一些不交集（Disjoint sets，一系...</p></div><div class="post-container"><p class="post-title"><a href="/2022/07/04/bf07598eb9c9/">线段树</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract">线段树线段树-原文
-线段树（英语：Segment tree）是一种二元树形资料结构，1977年由Jon Louis Bentley发明[1]，用以储存区间或线段，并且允许快速查询结构内包含某一点的所有区间。
-线段树，空间复杂度为 $O(n)$ ；可以在  $O(\log n)$  的时间复杂度内实现单点修改、区间...</p></div><div class="post-container"><p class="post-title"><a href="/2022/07/04/cf992e4068fd/">跳表</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract">跳表（SkipList）wiki
-发明者论文: Skip lists: a probabilistic alternative to balanced trees
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>风吹流年远</title><meta name="description" content="A Blog Powered By Hexo"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/" class="current">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-container"><p class="post-title"><a href="/2022/07/04/3b1471531eae/">并查集</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract">并查集(Disjoint-set
+data structure/Union-find data structure)
+并查集-wiki
+概念
+在计算机科学中，并查集（英文：Disjoint-set
+data structure，直译为不交集数据结构）是一种数据结构，用于处理一些不交集（Disjoint
+sets，...</p></div><div class="post-container"><p class="post-title"><a href="/2022/07/04/bf07598eb9c9/">线段树</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract">线段树
+线段树-原文
+线段树（英语：Segment tree）是一种二元树形资料结构，1977年由Jon
+Louis Bentley发明[1]，用以储存区间或线段，并且允许快速查询结构内包含某一点的所有区间。
+线段树，空间复杂度为 
+；可以在 
+的时间复杂度内实现单点修改、区间修改、区间查询（区间求和，求区间最大...</p></div><div class="post-container"><p class="post-title"><a href="/2022/07/04/cf992e4068fd/">跳表</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据结构/" title="数据结构" class="a-tag">数据结构</a><span>&nbsp;</span></span></p><p class="post-abstract">跳表（SkipList）
+wiki
+发明者论文:
+Skip lists: a probabilistic alternative to balanced trees
 参考文章1
 参考文章2
+
+
+
+
+
 
 
 
 算法
 平均
 最差
+
 
 
 
@@ -21,21 +151,26 @@ O(n log n)[1]
 
 搜索
 O(log n)
-O(n)[1]
+O(n)[...</p></div><div class="post-container"><p class="post-title"><a href="/2021/07/04/4db3a9983678/">位运算</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/位运算/" title="位运算" class="a-tag">位运算</a><span>&nbsp;</span></span></p><p class="post-abstract">概念
+位运算是把数字用二进制表示之后，对每一位上0或者1的运算。二进制及其位运算是现代计算机学科的基石，很多底层的技术都离不开位运算，因此位运算相关的题目也经常出现在面试中。
+原码、反码、补码
+机器数
+一个数在计算机中的二进制表示形式叫做这个数的机器数，机器数是带符号的，计算机用机器数的最高位放符号位，正数为
+0...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/26/2d0baa0a50bf/">书单</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-26</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/Books/" title="Books" class="a-tag">Books</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Read/" title="Read" class="a-tag">Read</a><span>&nbsp;</span></span></p><p class="post-abstract">如何学习
 
-
-插入...</p></div><div class="post-container"><p class="post-title"><a href="/2021/07/04/4db3a9983678/">位运算</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/位运算/" title="位运算" class="a-tag">位运算</a><span>&nbsp;</span></span></p><p class="post-abstract">概念位运算是把数字用二进制表示之后，对每一位上0或者1的运算。二进制及其位运算是现代计算机学科的基石，很多底层的技术都离不开位运算，因此位运算相关的题目也经常出现在面试中。
-原码、反码、补码机器数一个数在计算机中的二进制表示形式叫做这个数的机器数，机器数是带符号的，计算机用机器数的最高位放符号位，正数为 0，负数...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/26/2d0baa0a50bf/">书单</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-26</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/Books/" title="Books" class="a-tag">Books</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Read/" title="Read" class="a-tag">Read</a><span>&nbsp;</span></span></p><p class="post-abstract">如何学习
- 学习之道（A Mind for Numbers）芭芭拉·奥克利（Barbara Oakley）
+学习之道（A Mind for
+Numbers）芭芭拉·奥克利（Barbara Oakley）
 
 效率
- 深度工作
+
+深度工作
 
 计算机
- Effective Java
- Head First 设计模式
- 算法第四版
- 算法导论（可以看课程PPT）
- 设计模式（Design Pattern）
- OnJava8
- ...</p></div><div class="pagination no-margin-bottom"><p class="clearfix"><p> 第 1 页 / 共 1 页 &nbsp;</p><p><span class="pre pagbuttons"><i class="fa fa-angle-double-left"></i>&nbsp;<a role="navigation" href="/" aria-label="上一页">上一页</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/" aria-label="下一页">下一页</a>&nbsp;<i class="fa fa-angle-double-right"></i></span></p></p></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
+
+Effective Java
+Head First 设计模式
+算法第四版
+算法导论（可以看课程PPT）
+设计模式（Design Pattern）
+OnJava8
+《编码：隐匿...</p></div><div class="pagination no-margin-bottom"><p class="clearfix"><p> 第 1 页 / 共 1 页 &nbsp;</p><p><span class="pre pagbuttons"><i class="fa fa-angle-double-left"></i>&nbsp;<a role="navigation" href="/" aria-label="上一页">上一页</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/" aria-label="下一页">下一页</a>&nbsp;<i class="fa fa-angle-double-right"></i></span></p></p></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
