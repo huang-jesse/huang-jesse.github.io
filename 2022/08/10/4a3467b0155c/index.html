@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>Cookie和Session · 风吹流年远</title><meta name="description" content="Cookie和Session
+认识Cookie和Session
+Cookie 和
+Session 的详解与区别-原文
+HTTP 是一种无状态 (stateless)
+协议，本身不会对发送过的请求和相应的通信状态进行持久化处理，即服务端不保留与客户端交易时的任何状态。
+这样做的目的是为了保持 HTTP"><meta name="og:description" content="Cookie和Session
+认识Cookie和Session
+Cookie 和
+Session 的详解与区别-原文
+HTTP 是一种无状态 (stateless)
+协议，本身不会对发送过的请求和相应的通信状态进行持久化处理，即服务端不保留与客户端交易时的任何状态。
+这样做的目的是为了保持 HTTP"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="Cookie和Session"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>Cookie和Session</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-08-10</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/网络协议/" title="网络协议" class="a-tag">网络协议</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Cookie/" title="Cookie" class="a-tag">Cookie</a><span>&nbsp;</span><a href="/tags/Session/" title="Session" class="a-tag">Session</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><h1 id="cookie和session">Cookie和Session</h1>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/27669892">认识Cookie和Session</a></p>
+<p><a target="_blank" rel="noopener" href="http://dedenotes.com/html/cookie-session.html">Cookie 和
+Session 的详解与区别-原文</a></p>
+<p><code>HTTP</code> 是一种<code>无状态</code> (stateless)
+协议，本身不会对发送过的请求和相应的通信状态进行持久化处理，即服务端不保留与客户端交易时的任何状态。</p>
+<p>这样做的目的是为了保持 HTTP
+协议的简单性，大大减轻了服务器记忆负担，从而能够快速处理大量的事务，
+提高效率。</p>
+<p>然而，在许多应用场景中，我们需要保持用户登录的状态或记录用户购物车中的商品。由于
+HTTP 是无状态协议，所以必须引入一些技术来记录管理状态，例如 Cookie。</p>
+<h2 id="状态管理">状态管理</h2>
+<p>学习 Cookie 和 Session 之前先了解一下状态管理。</p>
+<p><code>状态管理</code>是将客户端与服务端之间多次交互当做一个整体，并将多次交互之间涉及的数据保存下来，提供给后续的交互进行数据的管理。</p>
+<p>状态是当前的数据，管理是在多次交互过程中对数据的存储、修改和删除。</p>
+<p>举个栗子：</p>
+<ul>
+<li><p>洗车卡</p></li>
+<li><p>记录洗车的次数，车主每次携带卡片洗车后，由商家修改洗车次数，车主可以携带走记录次数的卡片。(商家并不保存任何数据，客户自己携带需要维护的数据)</p></li>
+<li><p>理发店</p></li>
+<li><p>商家给客户一个卡号，每次客户来理发需要报上卡号，商家就会从系统中找到与此卡号对应的数据，修改后由商家保存。(客户带走的仅是卡号标识)</p></li>
+</ul>
+<p>上面两种模式就是数据的管理，各有利弊。程序中与上面两种模式对应的分别是
+Cookie(客户端管理) 和 Session（服务端管理）。</p>
+<h2 id="cookie">Cookie</h2>
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Cookie">wiki-Cookie</a></p>
+<p><code>Cookie</code> 最开始被设计出来是为了弥补 HTTP
+在状态管理上的不足，它是服务器发送到用户浏览器并保存在本地的小型文本数据，会在浏览器下次向服务器发起请求时，被携带并发送到服务器上。</p>
+<h3 id="工作流程">工作流程</h3>
+<ul>
+<li><p><img src="/2022/08/10/4a3467b0155c/1A241D18-0-1660814605624.png" alt="Cookie 和 Session 的详解与区别" style="zoom:80%;"></p></li>
+<li><p>① 请求：浏览器第一次发送请求到服务器；</p></li>
+<li><p>② 响应：服务器对浏览器给出响应，创建并通过响应头 Set-Cookie 将
+Cookie 发送给浏览器；</p></li>
+<li><p>③ 存储：浏览器接收到响应后会将 Cookie
+中的数据存储在文件或内存中；</p></li>
+<li><p>④ 携带：当浏览器再次向服务器发送请求时，会通过请求头将 Cookie
+传递给服务器；</p></li>
+<li><p>⑤ 获取：服务器通过自身封住好的 API
+获取这个请求头，然后给出响应。</p></li>
+</ul>
+<h3 id="常见属性">常见属性</h3>
+<p>Cookie 是一段不超过 4KB
+的小型文本数据，由一个名称（Name）、一个值（Value）和其它几个用于控制
+Cookie 有效期、安全性、使用范围的可选属性组成。</p>
+<figure>
+<img src="http://dedenotes.com/uploads/2109/20210924113748.png" alt="Cookie 和 Session 的详解与区别">
+<figcaption aria-hidden="true">Cookie 和 Session
+的详解与区别</figcaption>
+</figure>
+<p>关于 Cookie 常见属性的描述请浏览 <a target="_blank" rel="noopener" href="http://dedenotes.com/html/Cookie.html">Cookie
+的工作机制和属性介绍</a> 这篇文章。</p>
+<h3 id="存储类型">存储类型</h3>
+<p>Cookie 按存储类型可分为两类：Session Cookie（会话 Cookie）和
+Permanent Cookie（持久化 Cookie）。</p>
+<ul>
+<li>Session Cookie：会话 Cookie
+是存放在客户端浏览器的内存中，只在当前会话有效，在用户关闭会话页或浏览器时就销毁；</li>
+<li>Permanent Cookie：持久化 Cookie
+是存放在客户端硬盘中，超过过期时间或用户直接在网页中单击“注销”等按钮才会失效。</li>
+</ul>
+<h3 id="cookie-的特点">Cookie 的特点</h3>
+<ul>
+<li>Cookie
+数据存储在客户端，安全性低，一般用于存储少量的不敏感的信息。</li>
+<li>Cookie
+只能存储字符串，想存储其它类型的数据，需将其转换成字符串。</li>
+<li>Cookie 方便与 JS 交换数据，方便获取用户信息。</li>
+<li>Cookie 遵循同源策略，不能跨域访问，除非特别部署。</li>
+<li>浏览器对单个 Cookie 大小有限制（4KB），对同一个域名下的 Cookie
+总数量也有限制（20 个）。</li>
+<li>浏览器可能会禁用 Cookie。</li>
+</ul>
+<p>由于 Cookie
+存储在客户端，安全性低，我们希望登陆状态这些数据能存储在服务端，于是就有了
+Session 的概念。</p>
+<h2 id="session">Session</h2>
+<p><code>Session</code>
+翻译过来就是会话，<code>会话</code>是指客户端与服务端进行通讯的过程，比如用户在浏览器中点击一个超链接访问
+Web 资源，到关闭该标签页就是一个会话过程。</p>
+<h3 id="工作流程-1">工作流程</h3>
+<p><img src="/2022/08/10/4a3467b0155c/1A24154S-2.png" alt="Cookie 和 Session 的详解与区别" style="zoom:80%;"></p>
+<ul>
+<li><p>客户端第一次请求，提交用户名密码等信息进行登录认证，服务器根据客户端提交的信息进行鉴权，鉴权成功后创建
+Session 对象，用来保存相关数据，比如用户角色、登录时间等；</p></li>
+<li><p>服务器响应时将此 Session 的唯一标识信息 SessionID
+返回给客户端，客户端接收到后，会将此信息存入到 Cookie 中，同时 Cookie
+记录此 SessionID 属于哪个域名；</p></li>
+<li><p>客户端之后的每一次请求，浏览器都会自动将当前域名下的 Cookie
+信息发送给服务器；</p></li>
+<li><p>服务器解析 Cookie，获取到 SessionID，查找与之对应的 Session
+对象，如果 Session 对象存在说明用户已经登录，返回请求数据；</p></li>
+<li><p>如果 Session
+对象不存在或已过期，展示错误信息，并返回登陆页面。</p></li>
+<li><p>从上面的流程可知：</p></li>
+<li><p>Cookie 是存储在客户端（Client），而 Session
+保存在服务端（Server）。</p></li>
+<li><p>SessionID 是 Cookie 和 Session 中间的一道桥梁，需要借助 Cookie
+的传递才有意义。</p></li>
+</ul>
+<p>需要注意：如果浏览器禁用了 Cookie，还可以将 SessionID 直接写在 url
+中等方法进行传递，当然这种方法不常用。</p>
+<h3 id="session-的特点">Session 的特点</h3>
+<ul>
+<li>Session 是服务端保存数据的一种机制，用户的一些关键信息会保存在
+Session 中。</li>
+<li>Session 可以保存在文件、数据库、或内存中。</li>
+<li>每个用户对立一个独立的 Session，服务端会储存很多 Session。</li>
+<li>每个Session 都有自己的唯一 ID 即
+SessionID（客户端的唯一标识），它是维持一个会话的核心。</li>
+<li>Session 都有过期时间，如果一定时间没更新数据，就会消失。</li>
+</ul>
+<p>如果说 Cookie
+机制是通过检查客户身上的<code>通行证</code>来确定客户身份的话，那么
+Session
+机制就是通过检查服务器上的<code>客户明细表</code>来确认客户身份。</p>
+<p>Session
+相当于程序在服务器上建立的一份客户档案，客户来访的时候只需要查询客户档案表就可以了。</p>
+<h2 id="比较">比较</h2>
+<table>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Cookie</th>
+<th style="text-align: center;">Session</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">存储方式</td>
+<td style="text-align: center;">Cookie 存储在客户端，方便与 JS
+交互，方便获取用户信息。</td>
+<td style="text-align: center;">Session
+存储在服务端，高效、安全，不依赖浏览器环境。</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">存储类型</td>
+<td style="text-align: center;">Cookie 只能存储字符串。</td>
+<td style="text-align: center;">Session 可以存储任意数据类型。</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">存储大小</td>
+<td style="text-align: center;">Cookie
+大小有限制（4KB），同一域名下的数量也有限制（20 个）</td>
+<td style="text-align: center;">Session 没有类似的限制。</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">生命周期</td>
+<td style="text-align: center;">Cookie
+可设置为长时间保持，比如我们经常使用的默认登录功能。</td>
+<td style="text-align: center;">Session
+一般失效时间较短，客户端关闭（默认情况下）或者 Session
+超时都会失效。</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">安全性</td>
+<td style="text-align: center;">Cookie
+是本地存储，不是很安全，别人可以分析存放在本地的 Cookie 并进行欺骗，存在
+<a target="_blank" rel="noopener" href="http://dedenotes.com/html/cross-site.html">CSRF</a> 风险。</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">特点</td>
+<td style="text-align: center;">Cookie
+是客户端存储用户信息的一种机制，用来记录用户的一些信息，也是实现 Session
+的一种方式。</td>
+<td style="text-align: center;">Session
+是在服务端存储的一个数据结构，用来跟踪用户的状态，这个数据可以保存在内存、文件、数据库中。</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">总结</td>
+<td style="text-align: center;">1. Cookie
+遵循同源策略，不能跨域访问，除非特别部署。 2. SessionID
+是客户端的唯一标识，存储在 Cookie 中，它是维持一个会话的核心。 3. Cookie
+和 Session 都是为了在无状态的 HTTP
+协议之上维护会话状态，使得服务端可以知道当前是和哪个客户在“打交道”。</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p>其实，Cookie 和 Session
+无法放在一起对比，因为它们维度不同，放在一起比较，容易误导别人造成混乱。</p>
+<ul>
+<li><p>Cookie 是一个 HTTP 头部，而 Session 是一个虚拟概念。</p></li>
+<li><p>Cookie 可以用于实现 Session，也可以不。反过来说，Session
+也未必需要用 Cookie 实现。</p></li>
+<li><p>Session 指的是客户端与服务端维持的一个有状态会话，和 Cookie
+不是两种互斥的实现。</p></li>
+<li><p>Session 不能说这是纯服务端的事情，跟客户端也有关，也需要 Cookie
+的帮助。</p></li>
+<li><p>如果硬要进行比较，可把 Session 这一虚拟概念，分成两个实例，服务端
+Session 和 客户端 Session，由服务端 Session 和 Cookie
+进行比较（见上表）。</p></li>
+<li><p>客户端 Session 即 SessionID，存储在 Cookie 中，所以也是
+Cookie。</p></li>
+<li><p>Cookie 按存储类型可分为会话 Cookie 和 持久化 Cookie，前者即
+SessionID。</p></li>
+</ul>
+<p>所以，我们讨论 Session + Cookie 其实就是 Session
+认证，也可称为“基于服务器（或
+Session）认证”，是服务器认证的传统方式。</p>
+<h2 id="session-cookie">Session + Cookie</h2>
+<p><img src="/2022/08/10/4a3467b0155c/20211027172218.png" alt="Cookie 和 Session 的详解与区别" style="zoom:80%;"></p>
+<h3 id="优点">优点</h3>
+<ul>
+<li>一般的 Web 应用服务器都内置了对 Session
+的处理，不需要后端及前端开发人员理解交互逻辑，只需要简单的调用一个 API
+即可完成认证，方便使用。</li>
+<li>服务端可以控制 Session 机制的有效会话时间。</li>
+</ul>
+<h3 id="缺点">缺点</h3>
+<ul>
+<li><ol type="1">
+<li>信息丢失</li>
+</ol>
+<p>传统 Session
+认证一般都将认证信息存储在内存中，当服务器重启时就会丢失信息，导致所有用户都需要重新登录。</p></li>
+<li><ol start="2" type="1">
+<li>内存开销大</li>
+</ol>
+<p>当用户同时在线量比较多时，Session
+会占据较多的内存，增加了服务器的内存开销。</p></li>
+<li><ol start="3" type="1">
+<li>存储压力大</li>
+</ol>
+<p>使用数据库（或文件）存储 Session
+信息，会频繁的查询数据库，增加服务器性能开销和存储压力。</p></li>
+<li><ol start="4" type="1">
+<li>扩展性不强</li>
+</ol>
+<p>用户认证之后，服务端做认证记录，如果认证的信息被保存在内存中的话，这意味着用户下次请求还必须要请求在这台服务器上，才能拿到授权的资源。</p>
+<p>这样在分布式的应用上，相应的限制了负载均衡器的能力，这也意味着限制了应用的扩展能力。</p></li>
+<li><ol start="5" type="1">
+<li>部署困难</li>
+</ol>
+<p>由于认证信息存储在服务器，当网站采用 <a target="_blank" rel="noopener" href="http://dedenotes.com/html/distributed-cluster.html">集群</a>
+部署，会遇到多台 Web 服务器之间如何做 Session 共享的问题。</p>
+<p>例如，集群使用 Nginx 等负载均衡服务器分发请求，用户在 A
+服务器登录，认证信息存储在 A
+服务器上，如果用户下一个请求（如购物请求）被分发到了 B 服务器上。</p>
+<p>由于 B
+服务器没有用户的登录信息，导致用户会话失效又需要重新登录，造成不好的体验，此种方式虽然可以通过
+<code>ip hash</code> 来解决，但是达到 <a target="_blank" rel="noopener" href="http://dedenotes.com/html/load-balance.html">负载均衡</a>
+应有的效果会大打折扣。</p></li>
+<li><ol start="6" type="1">
+<li>不能跨域</li>
+</ol>
+<p>当多个应用要共享 Session 时，还会遇到跨域问题，难以实现单点登陆，因为
+Cookie 遵循同源策略，不能跨域访问，除非特别部署。</p></li>
+<li><ol start="7" type="1">
+<li>不支持移动端</li>
+</ol>
+<p>移动端对 Cookie 的支持不是很友好，而 Session 需要基于 Cookie
+实现。</p></li>
+<li><ol start="8" type="1">
+<li>CSRF 攻击</li>
+</ol>
+<p>攻击者可以伪造用户请求，欺骗用户点击，间接使用用户 Cookie
+向服务器发送请求，从而实现 CSRF（<a target="_blank" rel="noopener" href="http://dedenotes.com/html/cross-site.html">跨站请求伪造</a>）攻击。</p></li>
+<li><ol start="9" type="1">
+<li>禁用 Cookie</li>
+</ol>
+<p>浏览器端一旦禁止使用
+Cookie，将会造成用户会话永久失效，因为发起的请求中没有
+Cookie，服务端将无法识别用户。</p></li>
+</ul>
+<p>因此，Session 更加适合用于单体 Web 服务，在 tomcat + jsp
+或者其它这种前后端没有分离的项目中用的比较多。如果需要集群部署来应对业务需求，就需要使用负载均衡器来做
+Session 共享。</p>
+<h2 id="如何防止csrf攻击">如何防止CSRF攻击</h2>
+<p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2018/10/11/fe-security-csrf.html">前端安全系列（二）：如何防止CSRF攻击？</a></p>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2022/08/10/4a3467b0155c/%20风吹流年远%20Cookie和Session" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2022/08/10/b5e732d99697/" title="HTTP协议">下一篇: HTTP协议&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

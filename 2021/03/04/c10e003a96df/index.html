@@ -1,0 +1,532 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>缓存基础 · 风吹流年远</title><meta name="description" content="缓存整体介绍
+参考文章-缓存详细介绍
+参考文章-缓存更新策略
+参考文章-缓存底层原理
+概念
+缓存对高负载应用来说是至关重要的。一个典型的Web应用程序会提供大量的内容，直接生成这些内容的成本比采用缓存要高得多（包含检查和缓存超时的开销），所以采用缓存通常可以获得数量级的性能提升。诀窍是找到正确的粒度"><meta name="og:description" content="缓存整体介绍
+参考文章-缓存详细介绍
+参考文章-缓存更新策略
+参考文章-缓存底层原理
+概念
+缓存对高负载应用来说是至关重要的。一个典型的Web应用程序会提供大量的内容，直接生成这些内容的成本比采用缓存要高得多（包含检查和缓存超时的开销），所以采用缓存通常可以获得数量级的性能提升。诀窍是找到正确的粒度"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="缓存基础"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>缓存基础</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-03-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/缓存/" title="缓存" class="a-tag">缓存</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/缓存/" title="缓存" class="a-tag">缓存</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><p><a target="_blank" rel="noopener" href="https://www.cyc2018.xyz/%E5%85%B6%E5%AE%83/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98.html#%E7%BC%93%E5%AD%98">缓存整体介绍</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/27457401">参考文章-缓存详细介绍</a></p>
+<p><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/17416.html">参考文章-缓存更新策略</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/column/cpu-cache">参考文章-缓存底层原理</a></p>
+<h1 id="概念">概念</h1>
+<p>缓存对高负载应用来说是至关重要的。一个典型的Web应用程序会提供大量的内容，直接生成这些内容的成本比采用缓存要高得多（包含检查和缓存超时的开销），所以<strong>采用缓存通常可以获得数量级的性能提升。诀窍是找到正确的粒度和缓存过期策略组合。另外也需要决定哪些内容适合缓存，缓存在哪里</strong>。</p>
+<p><strong>典型的高负载应用会有很多层缓存。缓存并不仅仅发生在服务器上，而是在每一个环节</strong>，甚至包括用户的Web浏览器（这就是内容过期头的用处）。<strong>通常，缓存越接近客户端，就越节省资源并且效率更高。</strong>从浏览器缓存提供一张图片比从Web服务器的内存获取快得多，而从服务器的内存读取又比从服务器的磁盘上读取好得多。每种类型的缓存有其不一样的特点，例如容量和延时。</p>
+<p><strong>可以把缓存分成两大类：被动缓存和主动缓存。</strong></p>
+<p><strong>被动缓存</strong></p>
+<p>被动缓存除了存储和返回数据外不做任何事情。当从被动缓存请求一些内容时，要么可以得到结果，要么得到“结果不存在”。被动缓存的一个典型例子是memcached。</p>
+<p><strong>主动缓存</strong></p>
+<p>主动缓存会在访问未命中时做一些额外的工作。通常会将请求转发送给应用的其他部分来生成请求结果，然后存储该结果并返回给应用。Squid缓存代理服务器就是一个主动缓存。</p>
+<p>设计应用程序时，通常希望缓存是主动的（也可以叫做透明的），因为它们对应用隐藏了检查—生成—存储这个逻辑过程。也可以在被动缓存的前面构建一个主动缓存。</p>
+<h1 id="缓存并不总是有用">缓存并不总是有用</h1>
+<p><strong>必须确认缓存真的可以提升性能，因为有时缓存可能没有任何帮助。例如，在实践中发现从Nginx的内存中获取内容比从缓存代理中获取要快。如果代理的缓存在磁盘上则尤其如此。</strong></p>
+<p>原因很简单：缓存自身也有一些开销。比如检查缓存是否存在，如果命中则直接从缓存中返回数据。另外将缓存对象失效或者写入新的缓存对象都会有开销。缓存只在这些开销比没有缓存的情况下生成和提供数据的开销少时才有用。</p>
+<p><strong>如果有缓存时的开销比没有时要低，则说明缓存可能有用，但依然不能保证。还要记住，就像从Nginx的内存中获取数据比从代理在磁盘中的缓存获取要好一样，有些缓存的开销比另外一些要低。</strong></p>
+<p><strong>没有缓存时的开销</strong></p>
+<p>没有缓存时的开销就是为每个请求生成数据的开销。</p>
+<p><strong>有缓存时的开销</strong></p>
+<p>有缓存时的开销是检查缓存的开销加上缓存不命中的概率乘以生成数据的开销，再加上缓存命中的概率乘以缓存提供数据的开销。</p>
+<h1 id="缓存特征">缓存特征</h1>
+<h2 id="命中率">命中率</h2>
+<p>当某个请求能够通过访问缓存而得到响应时，称为缓存命中。</p>
+<p>缓存命中率越高，缓存的利用率也就越高。</p>
+<h2 id="最大空间">最大空间</h2>
+<p>缓存通常位于内存中，内存的空间通常比磁盘空间小的多，因此缓存的最大空间不可能非常大。</p>
+<p>当缓存存放的数据量超过最大空间时，就需要淘汰部分数据来存放新到达的数据。</p>
+<h2 id="清空策略淘汰策略">清空策略（淘汰策略）</h2>
+<p>缓存的存储空间有限制，当缓存空间被用满时，如何保证在稳定服务的同时有效提升命中率？这就由缓存清空策略来处理，设计适合自身数据特征的清空策略能有效提升命中率。常见的一般策略有：</p>
+<ul>
+<li><p><strong>FIFO(first in first out)</strong></p>
+<p>先进先出策略，最先进入缓存的数据在缓存空间不够的情况下（超出最大元素限制）会被优先被清除掉，以腾出新的空间接受新的数据。策略算法主要比较缓存元素的创建时间。在数据实效性要求场景下可选择该类策略，优先保障最新数据可用。</p></li>
+<li><p><strong>LFU(less frequently used)</strong></p>
+<p>最少使用策略，无论是否过期，根据元素的被使用次数判断，清除使用次数较少的元素释放空间。策略算法主要比较元素的hitCount（命中次数）。在保证高频数据有效性场景下，可选择这类策略。</p></li>
+<li><p><strong>LRU(least recently used)</strong></p>
+<p>最近最少使用策略，无论是否过期，根据元素最后一次被使用的时间戳，清除最远使用时间戳的元素释放空间。策略算法主要比较元素最近一次被get使用时间。在热点数据场景下较适用，优先保证热点数据的有效性。</p></li>
+</ul>
+<p>除此之外，还有一些简单策略比如：</p>
+<ul>
+<li>根据过期时间判断，清理过期时间最长的元素；</li>
+<li>根据过期时间判断，清理最近要过期的元素；</li>
+<li>随机清理；</li>
+<li>根据关键字（或元素内容）长短清理等。</li>
+</ul>
+<h2 id="缓存控制策略">缓存控制策略</h2>
+<p><strong>缓存也有像反范式化数据库设计一样的问题：重复数据，也就是说有多个地方需要更新数据，所以需要想办法避免读到脏数据。</strong></p>
+<h3 id="ttltime-to-live存活时间">TTL（time to live，存活时间）</h3>
+<p>缓存对象存储时设置一个过期时间；可以通过清理进程在达到过期时间后删掉对象，或者先留着直到下次访问时再清理（清理后需要使用新的版本替换）。对于数据很少变更或者没有新数据的情况，这是最好的失效策略。</p>
+<h3 id="显式失效">显式失效</h3>
+<p><strong>如果不能接受脏数据，那么进程在更新原始数据时需要同时使缓存失效。这种策略有两个变种：写—失效和写—更新。</strong></p>
+<p><strong>写—失效策略</strong>：只需要标记缓存数据已经过期（是否清理缓存数据是可选的）。</p>
+<p><strong>写—更新策略：</strong>在更新数据时就需要替换掉缓存项。无论如何，这都是非常有益的，特别是当生成缓存数据代价很昂贵时（写线程也许已经做了）。如果更新缓存数据，后续的请求将不再需要等待应用来生成。如果在后台做失效处理，例如基于TTL的失效，就可以在一个从用户请求完全分离出来的进程中生成失效数据的新版本。</p>
+<h3 id="读时失效">读时失效</h3>
+<p><strong>在更改旧数据时，为了避免要同时失效派生出来的脏数据，可以在缓存中保存一些信息，当从缓存中读数据时可以利用这些信息判断数据是否已经失效。</strong>和显式失效策略相比，<strong>这样做有很大的优势：成本固定且可以分散在不同时间内</strong>。</p>
+<p>假设要失效一个有一百万缓存对象依赖的对象，如果采用写时失效，需要一次在缓存中失效一百万个对象，即使有高效的方法来找到这些对象，也可能需要很长的时间才能完成。如果采用读时失效，写操作可以立即完成，但后续这一百万对象的读操作可能会有略微的延迟。这样就把失效一百万对象的开销分散了，并且可以帮助避免出现负载冲高和延迟增大的峰值。</p>
+<p><strong>一种最简单的读时失效的办法是采用对象版本控制。使用这种方法，在缓存中存储一个对象时，也可以存储对象所依赖的数据的当前版本号或者时间戳。</strong></p>
+<p>对象版本控制是一种简单的标记缓存方法，它可以处理更复杂的依赖关系。一个标记的缓存可以识别不同类型的依赖，并且分别跟踪每个依赖的版本。</p>
+<h2 id="缓存更新策略">缓存更新策略</h2>
+<p><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/17416.html">参考文章-酷壳</a></p>
+<p>缓存更新策略，描述了如何通过一定的方法，实现对缓存（Cache）和数据库（Repository）的更新。</p>
+<p><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/10910.html">分布式事务参考</a></p>
+<h3 id="cache-aside-pattern">Cache Aside Pattern</h3>
+<p>最常用的一种策略，Cache
+Aside中，我们的应用代码需要维护两个数据存储，一个是缓存（Cache），一个是数据库（Repository）。</p>
+<p>其具体逻辑如下：</p>
+<ul>
+<li><p><strong>失效</strong>：应用程序先从cache取数据，没有得到，则从数据库中取数据，成功后，放到缓存中。</p></li>
+<li><p><strong>命中</strong>：应用程序从cache中取数据，取到后返回。</p></li>
+<li><p><strong>更新</strong>：先把数据存到数据库中，成功后，再让缓存失效。</p></li>
+</ul>
+<p><img src="/2021/03/04/c10e003a96df/image-20220122191218273.png" alt="image-20220122191218273" style="zoom: 50%;"></p>
+<p>这个策略理论上有可能出现脏数据。比如，并发场景下，一个是读操作，但是没有命中缓存，然后就到数据库中取数据，此时来了一个写操作，写完数据库后，让缓存失效，然后，之前的那个读操作再把老的数据放进去，所以，会造成脏数据。这个case理论上会出现，不过，实际上出现的概率可能非常低，因为这个条件需要发生在读缓存时缓存失效，而且并发着有一个写操作。（但是由于不需要2PC或是Paxos协议保证一致性，因此该策略性能较好。）</p>
+<p>可以通过给缓存设置过期时间，来进一步规避脏数据的影响。</p>
+<h3 id="readwrite-through-pattern">Read/Write Through Pattern</h3>
+<p>Read/Write
+Through是把更新数据库（Repository）的操作由缓存自己代理了，所以，对于应用层来说，就简单很多了。<strong>可以理解为，应用认为后端就是一个单一的存储，而存储自己维护自己的Cache。</strong></p>
+<h4 id="read-through">Read Through</h4>
+<p>Read
+Through就是在查询操作中更新缓存，也就是说，当缓存失效的时候（过期或LRU换出），Cache
+Aside是由调用方负责把数据加载入缓存，而Read
+Through则用缓存服务自己来加载，从而对应用方是透明的。</p>
+<h4 id="write-through">Write Through</h4>
+<p>Write Through和Read
+Through相仿，不过是在更新数据时发生。当有数据更新的时候，如果没有命中缓存，直接更新数据库，然后返回。如果命中了缓存，则更新缓存，然后再由Cache自己更新数据库（这是一个同步操作）</p>
+<p><img src="/2021/03/04/c10e003a96df/image-20220122191819300.png" alt="image-20220122191819300" style="zoom:50%;"></p>
+<h3 id="write-behind-caching-pattern">Write Behind Caching Pattern</h3>
+<p>Write Behind 又叫 Write Back（Write Back是Linux文件系统的Page
+Cache的算法）。</p>
+<p><strong>Write
+Back策略就是，在更新数据的时候，只更新缓存，不更新数据库，而我们的缓存会异步地批量更新数据库。</strong>这个设计的好处就是让数据的I/O操作飞快无比（因为直接操作内存
+），因为异步，write
+back还可以合并对同一个数据的多次操作，所以性能的提高是相当可观的。</p>
+<p><strong>但是，其带来的问题是，数据不是强一致性的，而且可能会丢失。</strong></p>
+<p><strong>Write
+Back实现逻辑比较复杂，因为他需要track有哪数据是被更新了的，需要刷到持久层上。</strong>操作系统的write
+back会在仅当这个cache需要失效的时候，才会被真正持久起来，比如，内存不够了，或是进程退出了等情况，这又叫lazy
+write。</p>
+<p><img src="/2021/03/04/c10e003a96df/image-20220122192205827.png" alt="image-20220122192205827" style="zoom:50%;"></p>
+<h1 id="缓存位置">缓存位置</h1>
+<h2 id="浏览器">浏览器</h2>
+<p>当 HTTP 响应允许进行缓存时，浏览器会将
+HTML、CSS、JavaScript、图片等静态资源进行缓存。</p>
+<h2 id="isp">ISP</h2>
+<p>网络服务提供商（ISP）是网络访问的第一跳，通过将数据缓存在 ISP
+中能够大大提高用户的访问速度。</p>
+<h2 id="反向代理">反向代理</h2>
+<p>反向代理位于服务器之前，请求与响应都需要经过反向代理。通过将数据缓存在反向代理，在用户请求反向代理时就可以直接使用缓存进行响应。</p>
+<h2 id="本地缓存">本地缓存</h2>
+<p>使用 Guava Cache
+将数据缓存在服务器本地内存中，服务器代码可以直接读取本地内存中的缓存，速度非常快。</p>
+<h2 id="分布式缓存">分布式缓存</h2>
+<p>使用 Redis、Memcache 等分布式缓存将数据缓存在分布式缓存系统中。</p>
+<p>相对于本地缓存来说，分布式缓存单独部署，可以根据需求分配硬件资源。不仅如此，服务器集群都可以访问分布式缓存，而本地缓存需要在服务器集群之间进行同步，实现难度和性能开销上都非常大。</p>
+<h2 id="数据库缓存">数据库缓存</h2>
+<p>MySQL 等数据库管理系统具有自己的查询缓存机制来提高查询效率。</p>
+<h2 id="java-内部的缓存">Java 内部的缓存</h2>
+<p>Java
+为了优化空间，提高字符串、基本数据类型包装类的创建效率，设计了字符串常量池及
+Byte、Short、Character、Integer、Long、Boolean 这六种包装类缓冲池。</p>
+<h2 id="cpu-多级缓存">CPU 多级缓存</h2>
+<p>CPU 为了解决运算速度与主存 IO
+速度不匹配的问题，引入了多级缓存结构，同时使用 MESI
+等缓存一致性协议来解决多核 CPU 缓存数据一致性的问题。</p>
+<h1 id="cdn">CDN</h1>
+<p>内容分发网络（Content distribution
+network，CDN）是一种互连的网络系统，它利用更靠近用户的服务器从而更快更可靠地将
+HTML、CSS、JavaScript、音乐、图片、视频等静态资源分发给用户。</p>
+<p>CDN 主要有以下优点：</p>
+<ul>
+<li>更快地将数据分发给用户；</li>
+<li>通过部署多台服务器，从而提高系统整体的带宽性能；</li>
+<li>多台服务器可以看成是一种冗余机制，从而具有高可用性。</li>
+</ul>
+<p><img src="/2021/03/04/c10e003a96df/15313ed8-a520-4799-a300-2b6b36be314f.jpg" alt="img" style="zoom:80%;"></p>
+<h1 id="缓存问题">缓存问题</h1>
+<h2 id="缓存穿透">缓存穿透</h2>
+<p>访问一个缓存和数据库都不存在的
+key，此时会直接请求到数据库上，并且查不到数据，没法写缓存，所以下一次同样会请求到数据库上。</p>
+<p>此时，缓存起不到作用，请求每次都会走到数据库，流量大时数据库可能会被宕机。此时缓存就好像被“穿透”了一样，起不到任何作用。</p>
+<h3 id="解决方案">解决方案</h3>
+<ul>
+<li><strong>接口校验。</strong>在正常业务流程中可能会存在少量访问不存在
+key
+的情况，但是一般不会出现大量的情况，所以这种场景最大的可能性是遭受了非法攻击。可以在最外层先做一层校验：用户鉴权、数据合法性校验等，例如商品查询中，商品的ID是正整数，则可以直接对非正整数直接过滤等等。</li>
+<li><strong>缓存空值。</strong>当访问缓存和DB都没有查询到值时，可以将空值写进缓存，但是设置较短的过期时间，该时间需要根据产品业务特性来设置。</li>
+<li><strong><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/43263751">布隆过滤器</a>。</strong>使用布隆过滤器存储所有可能访问的
+key，不存在的 key 直接被过滤，存在的 key
+则再进一步查询缓存和数据库。</li>
+</ul>
+<h2 id="缓存击穿">缓存击穿</h2>
+<p>某一个热点
+key，在缓存过期的一瞬间，同时有大量的请求由于此时缓存过期了，所以请求最终都会走到数据库，造成瞬时数据库请求量大、压力骤增，甚至可能造成数据库宕机。</p>
+<h3 id="解决方案-1">解决方案</h3>
+<ul>
+<li><strong>加互斥锁</strong>。在并发的多个请求中，只有第一个请求线程能拿到锁并执行数据库查询操作，其他的线程拿不到锁就阻塞等着，等到第一个线程将数据写入缓存后，直接走缓存。</li>
+<li><strong>热点数据不过期</strong>。直接将缓存设置为不过期，然后由定时任务去异步加载数据，更新缓存。</li>
+</ul>
+<h2 id="缓存雪崩">缓存雪崩</h2>
+<p>大量的热点 key
+设置了相同的过期时间，导在缓存在同一时刻全部失效，造成瞬时数据库请求量大、压力骤增，引起雪崩，甚至导致数据库宕机。和缓存击穿不同的是，缓存击穿指并发查<code>同一条数据</code>，缓存雪崩是<code>不同数据</code>都过期了，很多数据都查不到从而查数据库。</p>
+<p>在有缓存的系统中，系统非常依赖于缓存，缓存分担了很大一部分的数据请求。当发生缓存雪崩时，数据库无法处理这么大的请求，导致数据库崩溃。</p>
+<h3 id="解决方案-2">解决方案</h3>
+<ul>
+<li><strong>过期时间打散</strong>。既然是大量缓存集中失效，那最容易想到就是让他们不集中生效。可以给缓存的过期时间时加上一个随机值时间，使得每个
+key 的过期时间分布开来，不会集中在同一时刻失效。</li>
+<li><strong>缓存预热。</strong>也可以进行缓存预热，避免在系统刚启动不久由于还未将大量数据进行缓存而导致缓存雪崩。</li>
+<li><strong>分布式缓存。</strong>为了防止缓存服务器宕机出现的缓存雪崩，可以使用分布式缓存，将热点数据均匀分布在不同节点中，当某个节点宕机时可以保证其它节点的缓存仍然可用。</li>
+<li><strong>热点数据不过期</strong>。该方式和缓存击穿一样，也是要着重考虑刷新的时间间隔和数据异常如何处理的情况。</li>
+<li><strong>加互斥锁</strong>。该方式和缓存击穿一样，按 key
+维度加锁，对于同一个
+key，只允许一个线程去计算，其他线程原地阻塞等待第一个线程的计算结果，然后直接走缓存即可。</li>
+</ul>
+<h2 id="缓存一致性">缓存一致性</h2>
+<p><a href="#缓存更新策略">缓存更新策略</a></p>
+<p>缓存一致性要求数据更新的同时缓存数据也能够实时更新。</p>
+<h3 id="解决方案-3">解决方案</h3>
+<ul>
+<li>在数据更新的同时立即去更新缓存；</li>
+<li>在读缓存之前先判断缓存是否是最新的，如果不是最新的先进行更新。</li>
+</ul>
+<p>要保证缓存一致性需要付出很大的代价，缓存数据最好是那些对一致性要求不高的数据，允许缓存数据存在一些脏数据。</p>
+<h2 id="缓存-无底洞-现象">缓存 “无底洞” 现象</h2>
+<p>指的是为了满足业务要求添加了大量缓存节点，但是性能不但没有好转反而下降了的现象。</p>
+<p>产生原因：缓存系统通常采用 hash 函数将 key
+映射到对应的缓存节点，随着缓存节点数目的增加，键值分布到更多的节点上，导致客户端一次批量操作会涉及多次网络操作，这意味着批量操作的耗时会随着节点数目的增加而不断增大。此外，网络连接数变多，对节点的性能也有一定影响。</p>
+<h3 id="解决方案-4">解决方案</h3>
+<ul>
+<li>优化批量数据操作命令；</li>
+<li>减少网络通信次数；</li>
+<li>降低接入成本，使用长连接 / 连接池，NIO 等。</li>
+</ul>
+<h1 id="数据分布">数据分布</h1>
+<h2 id="哈希分布">哈希分布</h2>
+<p>哈希分布就是将数据计算哈希值之后，按照哈希值分配到不同的节点上。例如有
+N 个节点，数据的主键为
+key，则将该数据分配的节点序号为：hash(key)%N。</p>
+<p>传统的哈希分布算法存在一个问题：当节点数量变化时，也就是 N
+值变化，那么几乎所有的数据都需要重新分布，将导致大量的数据迁移。</p>
+<h2 id="顺序分布">顺序分布</h2>
+<p>将数据划分为多个连续的部分，按数据的 ID
+或者时间分布到不同节点上。例如 User 表的 ID 范围为 1 ~
+7000，使用顺序分布可以将其划分成多个子表，对应的主键范围为 1 ~
+1000，1001 ~ 2000，...，6001 ~ 7000。</p>
+<p>顺序分布相比于哈希分布的主要优点如下：</p>
+<ul>
+<li>能保持数据原有的顺序；</li>
+<li>并且能够准确控制每台服务器存储的数据量，从而使得存储空间的利用率最大。</li>
+</ul>
+<h1 id="一致性哈希">一致性哈希</h1>
+<p>Distributed Hash Table（DHT）
+是一种哈希分布方式，其目的是为了克服传统哈希分布在服务器节点数量变化时大量数据迁移的问题。</p>
+<h2 id="基本原理">基本原理</h2>
+<p>将哈希空间 [0, 2n-1]
+看成一个哈希环，每个服务器节点都配置到哈希环上。每个数据对象通过哈希取模得到哈希值之后，存放到哈希环中顺时针方向第一个大于等于该哈希值的节点上。</p>
+<p><img src="/2021/03/04/c10e003a96df/68b110b9-76c6-4ee2-b541-4145e65adb3e.jpg" alt="img" style="zoom:80%;"></p>
+<p>一致性哈希在增加或者删除节点时只会影响到哈希环中相邻的节点，例如下图中新增节点
+X，只需要将它前一个节点 C 上的数据重新进行分布即可，对于节点 A、B、D
+都没有影响。</p>
+<p><img src="/2021/03/04/c10e003a96df/66402828-fb2b-418f-83f6-82153491bcfe.jpg" alt="img" style="zoom:80%;"></p>
+<h2 id="虚拟节点">虚拟节点</h2>
+<p>上面描述的一致性哈希存在数据分布不均匀的问题，节点存储的数据量有可能会存在很大的不同。</p>
+<p>数据不均匀主要是因为节点在哈希环上分布的不均匀，这种情况在节点数量很少的情况下尤其明显。</p>
+<p>解决方式是通过增加虚拟节点，然后将虚拟节点映射到真实节点上。虚拟节点的数量比真实节点来得多，那么虚拟节点在哈希环上分布的均匀性就会比原来的真实节点好，从而使得数据分布也更加均匀。</p>
+<h1 id="lru">LRU</h1>
+<p>以下是基于 双向链表 + HashMap 的 LRU 算法实现，对算法的解释如下：</p>
+<ul>
+<li>访问某个节点时，将其从原来的位置删除，并重新插入到链表头部。这样就能保证链表尾部存储的就是最近最久未使用的节点，当节点数量大于缓存最大空间时就淘汰链表尾部的节点。</li>
+<li>为了使删除操作时间复杂度为
+O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key
+到节点的映射，通过 Key 就能以 O(1) 的时间得到节点，然后再以 O(1)
+的时间将其从双向队列中删除。</li>
+</ul>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LRU</span><span class="token operator">&lt;</span>K<span class="token punctuation">,</span> V<span class="token operator">&gt;</span> <span class="token keyword">implements</span> <span class="token class-name">Iterable</span><span class="token operator">&lt;</span>K<span class="token operator">&gt;</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> Node head<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Node tail<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> HashMap<span class="token operator">&lt;</span>K<span class="token punctuation">,</span> Node<span class="token operator">&gt;</span> map<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> maxSize<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">class</span> <span class="token class-name">Node</span> <span class="token punctuation">{</span>
+
+        Node pre<span class="token punctuation">;</span>
+        Node next<span class="token punctuation">;</span>
+        K k<span class="token punctuation">;</span>
+        V v<span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token function">Node</span><span class="token punctuation">(</span>K k<span class="token punctuation">,</span> V v<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>k <span class="token operator">=</span> k<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>v <span class="token operator">=</span> v<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">public</span> <span class="token function">LRU</span><span class="token punctuation">(</span><span class="token keyword">int</span> maxSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">this</span><span class="token punctuation">.</span>maxSize <span class="token operator">=</span> maxSize<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span>maxSize <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">/</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        head <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tail <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        head<span class="token punctuation">.</span>next <span class="token operator">=</span> tail<span class="token punctuation">;</span>
+        tail<span class="token punctuation">.</span>pre <span class="token operator">=</span> head<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">public</span> V <span class="token function">get</span><span class="token punctuation">(</span>K key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>map<span class="token punctuation">.</span><span class="token function">containsKey</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        Node node <span class="token operator">=</span> map<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">unlink</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">appendHead</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> node<span class="token punctuation">.</span>v<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">put</span><span class="token punctuation">(</span>K key<span class="token punctuation">,</span> V value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">.</span><span class="token function">containsKey</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Node node <span class="token operator">=</span> map<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">unlink</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        Node node <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">appendHead</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;</span> maxSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Node toRemove <span class="token operator">=</span> <span class="token function">removeTail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            map<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>toRemove<span class="token punctuation">.</span>k<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">unlink</span><span class="token punctuation">(</span>Node node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        Node pre <span class="token operator">=</span> node<span class="token punctuation">.</span>pre<span class="token punctuation">;</span>
+        Node next <span class="token operator">=</span> node<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
+
+        pre<span class="token punctuation">.</span>next <span class="token operator">=</span> next<span class="token punctuation">;</span>
+        next<span class="token punctuation">.</span>pre <span class="token operator">=</span> pre<span class="token punctuation">;</span>
+
+        node<span class="token punctuation">.</span>pre <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        node<span class="token punctuation">.</span>next <span class="token operator">=</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">appendHead</span><span class="token punctuation">(</span>Node node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Node next <span class="token operator">=</span> head<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
+        node<span class="token punctuation">.</span>next <span class="token operator">=</span> next<span class="token punctuation">;</span>
+        next<span class="token punctuation">.</span>pre <span class="token operator">=</span> node<span class="token punctuation">;</span>
+        node<span class="token punctuation">.</span>pre <span class="token operator">=</span> head<span class="token punctuation">;</span>
+        head<span class="token punctuation">.</span>next <span class="token operator">=</span> node<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">private</span> Node <span class="token function">removeTail</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        Node node <span class="token operator">=</span> tail<span class="token punctuation">.</span>pre<span class="token punctuation">;</span>
+
+        Node pre <span class="token operator">=</span> node<span class="token punctuation">.</span>pre<span class="token punctuation">;</span>
+        tail<span class="token punctuation">.</span>pre <span class="token operator">=</span> pre<span class="token punctuation">;</span>
+        pre<span class="token punctuation">.</span>next <span class="token operator">=</span> tail<span class="token punctuation">;</span>
+
+        node<span class="token punctuation">.</span>pre <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        node<span class="token punctuation">.</span>next <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> node<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> Iterator<span class="token operator">&lt;</span>K<span class="token operator">&gt;</span> <span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Iterator</span><span class="token operator">&lt;</span>K<span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">private</span> Node cur <span class="token operator">=</span> head<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> cur <span class="token operator">!=</span> tail<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> K <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Node node <span class="token operator">=</span> cur<span class="token punctuation">;</span>
+                cur <span class="token operator">=</span> cur<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
+                <span class="token keyword">return</span> node<span class="token punctuation">.</span>k<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="copyonwrite">CopyOnWrite</h1>
+<p><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/11175.html">参考文章-JAVA中的COPYONWRITE容器</a></p>
+<p>Copy-On-Write简称COW，是一种用于程序设计中的优化策略。其基本思路是，从一开始大家都在共享同一个内容，当某个人想要修改这个内容的时候，才会真正把内容Copy出去形成一个新的内容然后再改，这是一种延时懒惰策略。</p>
+<h2 id="什么是copyonwrite容器">什么是CopyOnWrite容器</h2>
+<p>CopyOnWrite容器即写时复制的容器。通俗的理解是当我们往一个容器添加元素的时候，不直接往当前容器添加，而是先将当前容器进行Copy，复制出一个新的容器，然后新的容器里添加元素，添加完元素之后，再将原容器的引用指向新的容器。这样做的好处是我们可以对CopyOnWrite容器进行并发的读，而不需要加锁，因为当前容器不会添加任何元素。所以CopyOnWrite容器也是一种读写分离的思想，读和写不同的容器。</p>
+<h2 id="copyonwritearraylist的实现原理">CopyOnWriteArrayList的实现原理</h2>
+<p>以下代码是向ArrayList里添加元素，可以发现在添加的时候是需要加锁的，否则多线程写的时候会Copy出N个副本出来。</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">add</span><span class="token punctuation">(</span>T e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">final</span> ReentrantLock lock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>lock<span class="token punctuation">;</span>
+    lock<span class="token punctuation">.</span><span class="token function">lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        Object<span class="token punctuation">[</span><span class="token punctuation">]</span> elements <span class="token operator">=</span> <span class="token function">getArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> len <span class="token operator">=</span> elements<span class="token punctuation">.</span>length<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 复制出新数组</span>
+        Object<span class="token punctuation">[</span><span class="token punctuation">]</span> newElements <span class="token operator">=</span> Arrays<span class="token punctuation">.</span><span class="token function">copyOf</span><span class="token punctuation">(</span>elements<span class="token punctuation">,</span> len <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 把新元素添加到新数组里</span>
+        newElements<span class="token punctuation">[</span>len<span class="token punctuation">]</span> <span class="token operator">=</span> e<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 把原数组引用指向新数组</span>
+        <span class="token function">setArray</span><span class="token punctuation">(</span>newElements<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        lock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">setArray</span><span class="token punctuation">(</span>Object<span class="token punctuation">[</span><span class="token punctuation">]</span> a<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    array <span class="token operator">=</span> a<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>读的时候不需要加锁，如果读的时候有多个线程正在向ArrayList添加数据，读还是会读到旧的数据，因为写的时候不会锁住旧的ArrayList。</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">get</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">get</span><span class="token punctuation">(</span><span class="token function">getArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="copyonwrite的应用场景">CopyOnWrite的应用场景</h2>
+<p>CopyOnWrite并发容器用于读多写少的并发场景。比如白名单，黑名单，商品类目的访问和更新场景，假如我们有一个搜索网站，用户在这个网站的搜索框中，输入关键字搜索内容，但是某些关键字不允许被搜索。这些不能被搜索的关键字会被放在一个黑名单当中，黑名单每天晚上更新一次。</p>
+<h2 id="copyonwrite的缺点">CopyOnWrite的缺点</h2>
+<p>CopyOnWrite容器有很多优点，但是同时也存在两个问题，即内存占用问题和数据一致性问题。所以在开发的时候需要注意一下。</p>
+<p><strong>内存占用问题</strong>。因为CopyOnWrite的写时复制机制，所以在进行写操作的时候，内存里会同时驻扎两个对象的内存，旧的对象和新写入的对象（注意:在复制的时候只是复制容器里的引用，只是在写的时候会创建新对象添加到新容器里，而旧容器的对象还在使用，所以有两份对象内存）。如果这些对象占用的内存比较大，比如说200M左右，那么再写入100M数据进去，内存就会占用300M，那么这个时候很有可能造成频繁的Yong
+GC和Full
+GC。之前我们系统中使用了一个服务由于每晚使用CopyOnWrite机制更新大对象，造成了每晚15秒的Full
+GC，应用响应时间也随之变长。</p>
+<p>针对内存占用问题，可以通过压缩容器中的元素的方法来减少大对象的内存消耗，比如，如果元素全是10进制的数字，可以考虑把它压缩成36进制或64进制。或者不使用CopyOnWrite容器，而使用其他的并发容器，如<a target="_blank" rel="noopener" href="http://ifeve.com/concurrenthashmap/">ConcurrentHashMap</a>。</p>
+<p><strong>数据一致性问题</strong>。CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器。</p>
+<h1 id="缓存对象分层">缓存对象分层</h1>
+<p><strong>分层缓存对象对检索、失效和内存利用都有帮助。相对于只缓存对象，也可以缓存对象的ID、对象的ID组等通常需要一起检索的数据。</strong></p>
+<p>电子商务网站的搜索结果是这种技术很好的例子。一次搜索可能返回一个匹配产品的列表，包括名称、描述、缩略图，以及价格。缓存整个列表的效率很低：其他的搜索也可能会包含一些相同的产品，这就会导致数据重复，并且浪费内存。这种策略也使得当一个产品的价格变动时，找出并失效搜索结果变得很困难，因为你必须查看每个列表，找到哪些列表包含了更新过的产品。<strong>可以缓存关于搜索的最小信息，而不必缓存整个列表，例如返回结果的数量以及列表中的产品ID。然后可以再单独缓存每个产品。这样做可解决两个问题：不会重复存放任何结果数据，也更容易在失效产品的粒度上去失效缓存。</strong></p>
+<p><strong>缺点则是，相对于一次性获得整个搜索结果，必须在缓存中检索多个对象。</strong>然而不管怎么说，为搜索结果缓存产品ID的列表都是更有效的做法。先在一个缓存命中返回ID的列表，再使用这些ID去请求缓存获得产品信息。如果缓存允许在一次调用里返回多个结果，第二次请求就可以返回多个产品（memcached
+通过mget() 调用来支持）。</p>
+<p>如果使用不当，这种方法可能会导致奇怪的结果。假设使用TTL策略来失效搜索结果，并且当产品变更时显式地去失效单个产品。现在想象一下，一个产品的描述发生了变化，不再包含搜索中匹配的关键字，但是搜索结果的缓存还没有过期失效。此时用户就会看到错误的搜索结果，因为缓存的搜索结果将会引用这个变化了的产品，即使它
+不再包含匹配搜索的关键字。</p>
+<p>对于大多数应用程序来说，这不是问题。如果应用程序不能容忍这种情况，可以使用基于版本的缓存，并在执行搜索时在结果中存储产品的版本号。当发现搜索结果在缓存中时，可以将当前搜索结果的版本号和搜索结果中每个产品的版本号做比较。如果发现任何一个产品的版本数据不一致，可以重新搜索并且重新缓存结果。</p>
+<p><strong>虽然缓存很快，也可以避免很多工作，但是远程缓存访问的花销也是昂贵的。</strong>在LAN环境下网络往返缓存服务器通常也需要0.3ms左右。有很多案例，复杂的网页需要一千次左右的缓存访问来组合页面结果，这将会耗费3s左右的网络延时，意味着你的页面可能慢得不可接受，即使它甚至不需要访问数据库！因此，在这种情况下对缓存使用批量获取调用是非常重要的。对缓存进行分层，采用小一些的本地缓存，也可能获得很大的收益。</p>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2021/03/04/c10e003a96df/%20风吹流年远%20缓存基础" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2021/06/20/78d1148cb4a2/" title="微服务基础"><i class="fa fa-angle-double-left"></i>&nbsp;上一篇: 微服务基础</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2021/02/01/f4da271eba04/" title="数学基础">下一篇: 数学基础&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

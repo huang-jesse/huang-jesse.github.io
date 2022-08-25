@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>Spring 中 Bean 的生命周期 · 风吹流年远</title><meta name="description" content="Spring 中 Bean 的生命周期
+对于普通的 Java 对象，当 new
+的时候创建对象，当它没有任何引用的时候被垃圾回收机制回收。而由 Spring
+IoC 容器托管的对象，它们的生命周期完全由容器控制。
+bean 装载到 Spring 应用上下文中的一个典型的生命周期如下：
+
+
+bean "><meta name="og:description" content="Spring 中 Bean 的生命周期
+对于普通的 Java 对象，当 new
+的时候创建对象，当它没有任何引用的时候被垃圾回收机制回收。而由 Spring
+IoC 容器托管的对象，它们的生命周期完全由容器控制。
+bean 装载到 Spring 应用上下文中的一个典型的生命周期如下：
+
+
+bean "><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="Spring 中 Bean 的生命周期"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>Spring 中 Bean 的生命周期</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/生命周期/" title="生命周期" class="a-tag">生命周期</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><h1 id="spring-中-bean-的生命周期">Spring 中 Bean 的生命周期</h1>
+<p>对于普通的 Java 对象，当 new
+的时候创建对象，当它没有任何引用的时候被垃圾回收机制回收。而由 Spring
+IoC 容器托管的对象，它们的生命周期完全由容器控制。</p>
+<p>bean 装载到 Spring 应用上下文中的一个典型的生命周期如下：</p>
+<p><img src="/2021/06/20/1f2d34c02328/image-20211125171835297.png" alt="image-20211125171835297" style="zoom: 33%;"></p>
+<blockquote>
+<p>bean 在 Spring 容器中从创建到销毁经历了若干阶段，每一阶段都可以针对
+Spring 如何管理 bean 进行个性化定制。</p>
+</blockquote>
+<h2 id="beandefinition">BeanDefinition</h2>
+<h3 id="beandefinition-描述-bean-的对象信息"><strong>BeanDefinition 描述
+bean 的对象信息</strong></h3>
+<p>Spring 使用 BeanDefinition 的实例来描述对象的信息，BeanDefinition
+存储着我们给 Spring Bean 定义的元数据（<span class="citation" data-cites="Scope">@Scope</span>、<span class="citation" data-cites="Lazy">@Lazy</span>、<span class="citation" data-cites="DependsOn等等">@DependsOn等等</span>）;</p>
+<p><img src="/2021/06/20/1f2d34c02328/image-20211125213505944.png" alt="image-20211125213505944" style="zoom: 33%;"></p>
+<h3 id="beandefinitionmap-通过扫描收集-beandefinition"><strong>BeanDefinitionMap
+通过扫描收集 BeanDefinition</strong></h3>
+<p>Spring 在启动的时候需要「扫描」在XML/注解/JavaConfig 中需要被 Spring
+管理的 Bean 信息；</p>
+<p>随后，会将这些信息封装成 BeanDefinition，最后会把这些信息放到一个
+BeanDefinitionMap 中（Map的key是beanName，value则是 BeanDefinition
+对象）；</p>
+<p><img src="/2021/06/20/1f2d34c02328/image-20211125213525640.png" alt="image-20211125213525640" style="zoom: 33%;"></p>
+<h3 id="beanfactorypostprocessorbean-工厂后置处理器"><strong>BeanFactoryPostProcessor（Bean
+工厂后置处理器）</strong></h3>
+<p>接着会遍历这个 BeanDefinitionMap ，执行 BeanFactoryPostProcessor 这个
+Bean
+工厂后置处理器的逻辑（这里我们也可以自定义BeanFactoryPostProcessor来对我们定义好的Bean元数据进行获取或者修改）；</p>
+<p><img src="/2021/06/20/1f2d34c02328/image-20211125213943696.png" alt="image-20211125213943696" style="zoom: 33%;"></p>
+<p>BeanFactoryPostProcessor
+后置处理器执行完了以后，就到了实例化对象（详见以下<a href="#Bean%20的生命周期">Bean 的生命周期</a>）。</p>
+<h2 id="bean-的生命周期">Bean 的生命周期</h2>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/38597960">参考文章-知乎</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/74260806">参考文章-知乎2-通俗易懂</a></p>
+<h3 id="实例化"><strong>1. 实例化</strong></h3>
+<p>Spring 对 bean 进行实例化。</p>
+<p>对于 BeanFactory 容器，当客户向容器请求一个尚未初始化的 bean
+时，或初始化 bean 的时候需要注入另一个尚未初始化的依赖时，容器就会调用
+createBean 进行实例化。 对于 ApplicationContext
+容器，当容器启动结束后，便实例化所有的 bean 容器通过获取 BeanDefinition
+对象中的信息进行实例化。并且这一步仅仅是简单的实例化，并未进行依赖注入。
+实例化对象被包装在 BeanWrapper对 象中，BeanWrapper
+提供了设置对象属性的接口，从而避免了使用反射机制设置属性。</p>
+<h3 id="填充属性依赖注入"><strong>2. 填充属性（依赖注入）</strong></h3>
+<p>Spring 将值和 bean 的引用注入到 bean 对应的属性中。</p>
+<p>实例化后的对象被封装在 BeanWrapper
+对象中，并且此时对象仍然是一个原生的状态，并没有进行依赖注入。
+紧接着，Spring 根据 BeanDefinition 中的信息进行依赖注入。 并且通过
+BeanWrapper 提供的设置属性的接口完成依赖注入。</p>
+<blockquote>
+<p>紧接着，Spring 会检测该对象是否实现了 xxxAware 接口，并将相关的
+xxxAware 实例注入给 bean。</p>
+</blockquote>
+<h3 id="调用-beannameaware-的-setbeanname-方法"><strong>3. 调用
+BeanNameAware 的 setBeanName() 方法</strong></h3>
+<p>如果 bean 实现了 BeanNameAware 接口，Spring 将 bean 的 ID 传递给
+setBeanName() 方法。</p>
+<h3 id="调用-beanfactoryaware的-setbeanfactory-方法"><strong>4. 调用
+BeanFactoryAware的 setBeanFactory() 方法</strong></h3>
+<p>如果 bean 实现了 BeanFactoryAware 接口，Spring 将调用
+setBeanFactory() 方法，将 BeanFactory 容器实例传入。</p>
+<h3 id="调用-applicationcontextaware-的-setapplicationcontext-方法"><strong>5.
+调用 ApplicationContextAware 的 setApplicationContext()
+方法</strong></h3>
+<p>如果 bean 实现了 ApplicationContextAware 接口，Spring 将调用
+setApplicationContext() 方法，将 bean
+所在的应用上下文的引用传入进来。</p>
+<blockquote>
+<p>当经过上述几个步骤后，bean对象已经被正确构造，但如果你想要对象被使用前再进行一些自定义的处理，就可以通过
+BeanPostProcessor 接口实现。</p>
+</blockquote>
+<h3 id="调用-beanpostprocessor-的预初始化方法前置处理"><strong>6. 调用
+BeanPostProcessor 的预初始化方法（前置处理）</strong></h3>
+<p>如果 bean 实现了 BeanPostProcessor 接口，Spring 将调用他们的
+postProcessorBeforeInitialization() 方法。</p>
+<blockquote>
+<p>当前正在初始化的 bean 对象会被传递进来，我们就可以对这个 bean
+作任何处理。 这个函数会先于 InitialzationBean
+执行，因此称为前置处理。</p>
+</blockquote>
+<h3 id="调用-initializingbean-的-afterpropertiesset-方法"><strong>7.
+调用 InitializingBean 的 afterPropertiesSet() 方法</strong></h3>
+<p>如果 bean 实现了 InitializingBean 接口，Spring 将调用它们的
+afterPropertiesSet() 方法。</p>
+<h3 id="调用自定义的初始化方法bean-的-init-method-属性"><strong>8.
+调用自定义的初始化方法(bean 的 init-method 属性)</strong></h3>
+<p>如果 bean 使用了 init-method 声明了初始化方法，Spring 将调用 bean
+中声明的该方法。</p>
+<blockquote>
+<p>bean 的初始化拓展一共有三个，<span class="citation" data-cites="PostConstruct">@PostConstruct</span>,
+InitializingBean.afterPropertiesSet(),
+init-method（执行顺序也是这样）</p>
+</blockquote>
+<h3 id="调用-beanpostprocessor-的初始化后方法后置处理"><strong>9. 调用
+BeanPostProcessor 的初始化后方法（后置处理）</strong></h3>
+<p>如果 bean 实现了 BeanPostProcessor 接口，Spring 将调用它们的
+postProcessorAfterInitialization() 方法。</p>
+<blockquote>
+<p>当前正在初始化的 bean 对象会被传递进来，我们就可以对这个 bean
+作任何处理。 这个函数会在 InitialzationBean
+完成后执行，因此称为后置处理。</p>
+</blockquote>
+<blockquote>
+<p>此时，bean
+已经准备就绪，可以被应用程序使用了，它们将一直驻留在应用上下文中（ApplicationContext
+容器），直到该应用上下文被销毁。</p>
+</blockquote>
+<h3 id="调用-disposablebean-的-destroy-方法"><strong>10. 调用
+DisposableBean 的 destroy() 方法</strong></h3>
+<blockquote>
+<p>容器关闭后，调用该方法</p>
+</blockquote>
+<p>如果 bean 实现了 DisposableBean 接口，Spring 将调用它们的 destroy()
+接口方法。</p>
+<h3 id="调用自定义的销毁方法bean-的-destroy-method-属性"><strong>11.
+调用自定义的销毁方法(bean 的 destroy-method 属性)</strong></h3>
+<p>如果 bean 使用 destroy-method 声明了销毁方法。Spring 将调用 bean
+中声明的该方法。</p>
+<blockquote>
+<p>bean 的销毁拓展一共有三个，<span class="citation" data-cites="PreDestory">@PreDestory</span>, DisposableBean.destroy(),
+destroy-method（执行顺序也是这样）</p>
+</blockquote>
+<h2 id="代码示例">代码示例</h2>
+<p><strong>xml 配置文件</strong></p>
+<pre class="line-numbers language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>beans</span> <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://www.springframework.org/schema/beans<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">xmlns:</span>xsi</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://www.w3.org/2001/XMLSchema-instance<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">xsi:</span>schemaLocation</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>bean</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>beanLifecycle<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.huang.bean.BeanLifecycle<span class="token punctuation">"</span></span> 
+        <span class="token attr-name">init-method</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>myInitMethod<span class="token punctuation">"</span></span> <span class="token attr-name">destroy-method</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>myDestroyMethod<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>comment<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>test comment<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>bean</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>bean</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>beanPostProcessor<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.huang.processor.MyBeanPostProcessor<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>bean</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>bean</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>beanFactoryPostProcessor<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.huang.processor.MyBeanFactoryPostProcessor<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>bean</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>beans</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>bean 类</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>huang<span class="token punctuation">.</span>bean<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// omitted imports</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BeanLifecycle</span> <span class="token keyword">implements</span> <span class="token class-name">BeanNameAware</span><span class="token punctuation">,</span> BeanFactoryAware<span class="token punctuation">,</span> ApplicationContextAware<span class="token punctuation">,</span> InitializingBean<span class="token punctuation">,</span> DisposableBean <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> String comment<span class="token punctuation">;</span>
+    
+    <span class="token keyword">public</span> <span class="token function">BeanLifecycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【实例化】BeanLifecycle无参实例化"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setComment</span><span class="token punctuation">(</span>String comment<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【填充属性】设置comment属性值为："</span> <span class="token operator">+</span> comment<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>comment <span class="token operator">=</span> comment<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> String <span class="token function">getComment</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>comment<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setBeanName</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用BeanNameAware的setBeanName()方法】beanName: "</span> <span class="token operator">+</span> name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setBeanFactory</span><span class="token punctuation">(</span>BeanFactory beanFactory<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用BeanFactoryAware的setBeanFactory()方法】beanFactory: "</span> <span class="token operator">+</span> beanFactory<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setApplicationContext</span><span class="token punctuation">(</span>ApplicationContext applicationContext<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用ApplicationContextAware的setApplicationContext()方法】applicationContext: "</span> <span class="token operator">+</span> applicationContext<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">afterPropertiesSet</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用InitializingBean的afterPropertiesSet()方法】bean初始化方法，可以增加一些校验等操作，comment: "</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>comment<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">myInitMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用自定义的初始化方法】bean初始化方法，自定义myInitMethod()，comment: "</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>comment<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【容器关闭】"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用DisposableBean的destroy()方法】"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">myDestroyMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用自定义的销毁方法】"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>BeanFactoryPostProcessor 实现</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>huang<span class="token punctuation">.</span>processor<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>BeansException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>config<span class="token punctuation">.</span>BeanDefinition<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>config<span class="token punctuation">.</span>BeanFactoryPostProcessor<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ConfigurableListableBeanFactory<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>config<span class="token punctuation">.</span>TypedStringValue<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyBeanFactoryPostProcessor</span> <span class="token keyword">implements</span> <span class="token class-name">BeanFactoryPostProcessor</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token function">MyBeanFactoryPostProcessor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【BeanFactoryPostProcessor(Bean 工厂后置处理器)无参实例化】"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">postProcessBeanFactory</span><span class="token punctuation">(</span>ConfigurableListableBeanFactory beanFactory<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用 BeanFactoryPostProcessor(Bean 工厂后置处理器)的 postProcessBeanFactory() 方法】"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String myBeanName <span class="token operator">=</span> <span class="token string">"beanLifecycle"</span><span class="token punctuation">;</span>
+        BeanDefinition bd <span class="token operator">=</span> beanFactory<span class="token punctuation">.</span><span class="token function">getBeanDefinition</span><span class="token punctuation">(</span>myBeanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        TypedStringValue comment <span class="token operator">=</span> <span class="token punctuation">(</span>TypedStringValue<span class="token punctuation">)</span>bd<span class="token punctuation">.</span><span class="token function">getPropertyValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getPropertyValue</span><span class="token punctuation">(</span><span class="token string">"comment"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【获取指定 bean 的 BeanDefinition 描述】beanName: "</span> <span class="token operator">+</span> myBeanName <span class="token operator">+</span> <span class="token string">" ,property comment: "</span> <span class="token operator">+</span> comment<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>BeanPostProcessor 实现</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>huang<span class="token punctuation">.</span>processor<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>BeansException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>config<span class="token punctuation">.</span>BeanPostProcessor<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyBeanPostProcessorImpl</span> <span class="token keyword">implements</span> <span class="token class-name">BeanPostProcessor</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> Object <span class="token function">postProcessBeforeInitialization</span><span class="token punctuation">(</span>Object bean<span class="token punctuation">,</span> String beanName<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用BeanPostProcessor的预初始化方法】postProcessBeforeInitialization执行，beanName: "</span> <span class="token operator">+</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> bean<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> Object <span class="token function">postProcessAfterInitialization</span><span class="token punctuation">(</span>Object bean<span class="token punctuation">,</span> String beanName<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用BeanPostProcessor的初始化后方法】postProcessAfterInitialization执行，beanName: "</span> <span class="token operator">+</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> bean<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>测试</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">import</span> org<span class="token punctuation">.</span>junit<span class="token punctuation">.</span>Test<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>ApplicationContext<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>support<span class="token punctuation">.</span>AbstractApplicationContext<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>support<span class="token punctuation">.</span>ClassPathXmlApplicationContext<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>huang<span class="token punctuation">.</span>bean<span class="token punctuation">.</span>BeanLifecycle<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BeanLifecycleTest</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        ApplicationContext context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">(</span><span class="token string">"beanlifecycle-beans.xml"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【调用context.getBean()方法，从上下文容器中获取bean实例】"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        BeanLifecycle beanLifecycle <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"beanLifecycle"</span><span class="token punctuation">,</span> BeanLifecycle<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"【操作bean实例，调用getComment()方法】comment: "</span> <span class="token operator">+</span> beanLifecycle<span class="token punctuation">.</span><span class="token function">getComment</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span>AbstractApplicationContext<span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>测试输出</strong></p>
+<pre><code>【BeanFactoryPostProcessor(Bean 工厂后置处理器)无参实例化】
+【调用 BeanFactoryPostProcessor(Bean 工厂后置处理器)的 postProcessBeanFactory() 方法】
+【获取指定 bean 的 BeanDefinition 描述】beanName: beanLifecycle property comment: test comment
+【实例化】BeanLifecycle无参实例化
+【填充属性】设置comment属性值为：test comment
+【调用BeanNameAware的setBeanName()方法】beanName: beanLifecycle
+【调用BeanFactoryAware的setBeanFactory()方法】beanFactory: class org.springframework.beans.factory.support.DefaultListableBeanFactory
+【调用ApplicationContextAware的setApplicationContext()方法】applicationContext: class org.springframework.context.support.ClassPathXmlApplicationContext
+【调用BeanPostProcessor的预初始化方法】postProcessBeforeInitialization执行，beanName: beanLifecycle
+【调用InitializingBean的afterPropertiesSet()方法】bean初始化方法，可以增加一些校验等操作，comment: test comment
+【调用自定义的初始化方法】bean初始化方法，自定义myInitMethod()，comment: test comment
+【调用BeanPostProcessor的初始化后方法】postProcessAfterInitialization执行，beanName: beanLifecycle
+【调用context.getBean()方法，从上下文容器中获取bean实例】
+【操作bean实例，调用getComment()方法】comment: test comment
+【容器关闭】
+【调用DisposableBean的destroy()方法】
+【调用自定义的销毁方法】</code></pre>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2021/06/20/1f2d34c02328/%20风吹流年远%20Spring 中 Bean 的生命周期" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2021/06/20/94f5629b61c4/" title="Spring的循环依赖问题"><i class="fa fa-angle-double-left"></i>&nbsp;上一篇: Spring的循环依赖问题</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2021/06/20/855bde794939/" title="SpringCore笔记">下一篇: SpringCore笔记&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>Spring的循环依赖问题 · 风吹流年远</title><meta name="description" content="Spring的循环依赖问题
+参考文章-Spring源码流程分析
+参考文章-Spring三级缓存分析
+参考文章-Spring循环依赖场景分析
+概念
+循环依赖：是一个或多个对象实例之间存在直接或间接的依赖关系，这种依赖关系构成了构成一个环形调用。
+循环依赖分为三种，自身依赖于自身、互相循环依赖、多组循环"><meta name="og:description" content="Spring的循环依赖问题
+参考文章-Spring源码流程分析
+参考文章-Spring三级缓存分析
+参考文章-Spring循环依赖场景分析
+概念
+循环依赖：是一个或多个对象实例之间存在直接或间接的依赖关系，这种依赖关系构成了构成一个环形调用。
+循环依赖分为三种，自身依赖于自身、互相循环依赖、多组循环"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="Spring的循环依赖问题"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>Spring的循环依赖问题</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/循环依赖/" title="循环依赖" class="a-tag">循环依赖</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><h1 id="spring的循环依赖问题">Spring的循环依赖问题</h1>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/84267654">参考文章-Spring源码流程分析</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/438247718">参考文章-Spring三级缓存分析</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/438247718/answer/1730527725">参考文章-Spring循环依赖场景分析</a></p>
+<h2 id="概念">概念</h2>
+<p><strong>循环依赖：</strong>是一个或多个对象实例之间存在直接或间接的依赖关系，这种依赖关系构成了构成一个环形调用。</p>
+<p>循环依赖分为三种，自身依赖于自身、互相循环依赖、多组循环依赖。</p>
+<blockquote>
+<p>所以 Spring
+提供了除了构造函数注入和原型注入外的，setter循环依赖注入解决方案。</p>
+</blockquote>
+<figure>
+<img src="/2021/06/20/94f5629b61c4/image-20211129161343212.png" alt="image-20211129161343212">
+<figcaption aria-hidden="true">image-20211129161343212</figcaption>
+</figure>
+<h2 id="spring-处理循环依赖的流程">Spring 处理循环依赖的流程</h2>
+<h3 id="流程概述">流程概述</h3>
+<blockquote>
+<p>此处以经典的《单例 setter 注入引起的循环依赖》为例</p>
+</blockquote>
+<p><strong>代码实例</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService1</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService2 testService2<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService2</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService1 testService1<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>Spring 的三级缓存</strong></p>
+<ul>
+<li>singletonObjects:
+一级缓存，用于保存实例化、注入、初始化完成的bean实例</li>
+<li>earlySingletonObjects:
+二级缓存，用于保存实例化完成的bean实例（<strong>二级缓存为了性能</strong>，从三级缓存拿到工厂后，创建AOP增强后的代理对象放入二级缓存，这样就不用每次重新创建了）</li>
+<li>singletonFactories:
+三级缓存，用于保存bean创建工厂，以便于后面扩展有机会创建代理对象。（<strong>三级缓存为了拿到代理对象</strong>，三级缓存的Value是ObjectFactory，用于创建AOP增强后的代理对象）</li>
+</ul>
+<p><strong>流程图</strong></p>
+<p><img src="/2021/06/20/94f5629b61c4/image-20211129180606892.png" alt="image-20211129180606892" style="zoom:80%;"></p>
+<blockquote>
+<p>当 testService2 从三级缓存中获取到 testService1 的实例后，会将
+testService1 的实例添加到二级缓存中，同时删除 testService1
+对应的三级缓存。</p>
+</blockquote>
+<h3 id="spring-源码分析流程">Spring 源码分析流程</h3>
+<blockquote>
+<p>延续上述实例代码</p>
+</blockquote>
+<p><strong>代码运行流程图</strong></p>
+<p><img src="/2021/06/20/94f5629b61c4/image-20211129181647290.png" alt="image-20211129181647290" style="zoom: 50%;"></p>
+<p><strong>bean 获取实例代码</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    ApplicationContext context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AnnotationConfigApplicationContext</span><span class="token punctuation">(</span>CircularReferenceConfiguration<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    TestService1 testService1 <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"testService1"</span><span class="token punctuation">,</span> TestService1<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    testService1<span class="token punctuation">.</span><span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">(</span><span class="token punctuation">(</span>AbstractApplicationContext<span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="调用-getbean-获取-bean-对象">1. 调用 <code>getBean()</code> 获取
+bean 对象</h4>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> T <span class="token function">getBean</span><span class="token punctuation">(</span>String name<span class="token punctuation">,</span> Class<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> requiredType<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">doGetBean</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> requiredType<span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>从 getBean 进入后，获取 bean 的操作会进入到 doGetBean。</li>
+<li>之所以这样包装一层，是因为 doGetBean
+有很多不同入参的重载方法，方便外部操作。</li>
+</ul>
+<h4 id="bean-对象获取的具体实现-dogetbean-方法">2. bean
+对象获取的具体实现 <code>doGetBean()</code> 方法</h4>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">protected</span>  T <span class="token function">doGetBean</span><span class="token punctuation">(</span><span class="token keyword">final</span> String name<span class="token punctuation">,</span> <span class="token annotation punctuation">@Nullable</span> <span class="token keyword">final</span> Class <span class="token class-name">requiredType</span><span class="token punctuation">,</span>
+    <span class="token annotation punctuation">@Nullable</span> <span class="token keyword">final</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">,</span> <span class="token keyword">boolean</span> typeCheckOnly<span class="token punctuation">)</span> <span class="token keyword">throws</span> BeansException <span class="token punctuation">{</span>
+  
+  <span class="token comment" spellcheck="true">// 尝试通过bean名称，从缓存中获取目标bean对象。</span>
+  Object sharedInstance <span class="token operator">=</span> <span class="token function">getSingleton</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">// 我们这里的目标对象都是单例的</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">isSingleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+    <span class="token comment" spellcheck="true">// 这里就尝试创建目标对象，第二个参数传的就是一个ObjectFactory类型的对象，这里是使用Java8的lamada</span>
+    <span class="token comment" spellcheck="true">// 表达式书写的，只要上面的getSingleton()方法返回值为空，则会调用这里的getSingleton()方法来创建</span>
+    <span class="token comment" spellcheck="true">// 目标对象</span>
+    sharedInstance <span class="token operator">=</span> <span class="token function">getSingleton</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token punctuation">{</span>
+      <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 尝试创建目标对象</span>
+        <span class="token keyword">return</span> <span class="token function">createBean</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">BeansException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">throw</span> ex<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>T<span class="token punctuation">)</span> bean<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里的 doGetBean()
+方法是非常关键的一个方法（中间省略了其他代码），上面也主要有两个步骤</p>
+<ul>
+<li><p>第一个步骤的 getSingleton()
+方法的作用是尝试从缓存中获取目标对象，如果没有获取到，则尝试获取半成品的目标对象；如果第一个步骤没有获取到目标对象的实例，那么就进入第二个步骤</p></li>
+<li><p>第二个步骤的 getSingleton()
+方法的作用是尝试创建目标对象，并且为该对象注入其所依赖的属性。</p></li>
+</ul>
+<h4 id="getsingleton-从缓存中获取目标对象">3.
+<code>getSingleton()</code> 从缓存中获取目标对象</h4>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Nullable</span>
+<span class="token keyword">protected</span> Object <span class="token function">getSingleton</span><span class="token punctuation">(</span>String beanName<span class="token punctuation">,</span> <span class="token keyword">boolean</span> allowEarlyReference<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  
+  <span class="token comment" spellcheck="true">// 尝试从一级缓存中获取成品的目标对象，如果存在，则直接返回</span>
+  Object singletonObject <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>singletonObjects<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token comment" spellcheck="true">// 如果缓存中不存在目标对象，则判断当前对象是否已经处于创建过程中。</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>singletonObject <span class="token operator">==</span> null <span class="token operator">&amp;&amp;</span> <span class="token function">isSingletonCurrentlyInCreation</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+    <span class="token keyword">synchronized</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>singletonObjects<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 从二级缓存中获取半成品目标对象</span>
+      singletonObject <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>earlySingletonObjects<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>singletonObject <span class="token operator">==</span> null <span class="token operator">&amp;&amp;</span> allowEarlyReference<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        
+        <span class="token comment" spellcheck="true">// 这里的singletonFactories是一个Map，其key是bean的名称，而值是一个ObjectFactory类型的</span>
+        <span class="token comment" spellcheck="true">// 对象，这里对于TestService1和TestService2而言，调用其getObject()方法返回的就是对象的实例，无论是否是半成品</span>
+        <span class="token comment" spellcheck="true">// 从三级缓存中获取工厂对象，创建实例后放入二级缓存中，然后删除工厂对象的缓存</span>
+        ObjectFactory singletonFactory <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>singletonFactories<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>singletonFactory <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          
+          <span class="token comment" spellcheck="true">// 获取目标对象的实例</span>
+          singletonObject <span class="token operator">=</span> singletonFactory<span class="token punctuation">.</span><span class="token function">getObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span>earlySingletonObjects<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> singletonObject<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span>singletonFactories<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> singletonObject<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里我们会存在一个问题就是 bean
+的半成品实例是如何实例化的，然后是如何将其封装为一个 ObjectFactory
+类型的对象，并且将其放到上面的 singletonFactories 属性中的。</p>
+<p>这主要是在前面的第二个 getSingleton()
+方法中，其最终会通过其传入的第二个参数，从而调用 createBean()
+方法，该方法的最终调用是委托给了另一个 doCreateBean() 方法进行的</p>
+<h4 id="调用-docreatebean-实例化-bean-对象">4. 调用
+<code>doCreateBean()</code> 实例化 bean 对象</h4>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">protected</span> Object <span class="token function">doCreateBean</span><span class="token punctuation">(</span><span class="token keyword">final</span> String beanName<span class="token punctuation">,</span> <span class="token keyword">final</span> RootBeanDefinition mbd<span class="token punctuation">,</span> <span class="token keyword">final</span> <span class="token annotation punctuation">@Nullable</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+  <span class="token keyword">throws</span> BeanCreationException <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// 实例化当前尝试获取的bean对象</span>
+  BeanWrapper instanceWrapper <span class="token operator">=</span> null<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">isSingleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    instanceWrapper <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>factoryBeanInstanceCache<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>instanceWrapper <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    instanceWrapper <span class="token operator">=</span> <span class="token function">createBeanInstance</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">// 判断Spring是否配置了支持提前暴露目标bean，也就是是否支持提前暴露半成品的bean</span>
+  <span class="token keyword">boolean</span> earlySingletonExposure <span class="token operator">=</span> <span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">isSingleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>allowCircularReferences 
+    <span class="token operator">&amp;&amp;</span> <span class="token function">isSingletonCurrentlyInCreation</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>earlySingletonExposure<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+    <span class="token comment" spellcheck="true">// 如果支持，这里就会将当前生成的半成品的bean放到singletonFactories中，这个singletonFactories</span>
+    <span class="token comment" spellcheck="true">// 就是前面第一个getSingleton()方法中所使用到的singletonFactories属性，也就是说，这里就是</span>
+    <span class="token comment" spellcheck="true">// 封装半成品的bean的地方。而这里的getEarlyBeanReference()本质上是直接将放入的第三个参数，也就是</span>
+    <span class="token comment" spellcheck="true">// 目标bean直接返回</span>
+    <span class="token function">addSingletonFactory</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token function">getEarlyBeanReference</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> bean<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 在初始化实例之后，这里就是判断当前bean是否依赖了其他的bean，如果依赖了，</span>
+    <span class="token comment" spellcheck="true">// 就会递归的调用getBean()方法尝试获取目标bean</span>
+    <span class="token function">populateBean</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> instanceWrapper<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 省略...</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> exposedObject<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="spring-中循环依赖出现的场景">Spring 中循环依赖出现的场景</h2>
+<p><img src="/2021/06/20/94f5629b61c4/v2-6fd43ded717a9c31b0a9abae0234db9b_1440w.jpg" alt="img" style="zoom:50%;"></p>
+<h3 id="单例的setter注入scope_singleton">单例的setter注入(SCOPE_SINGLETON)</h3>
+<blockquote>
+<p>Spring 默认就可以解决这种场景下的循环依赖</p>
+</blockquote>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService1</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService2 testService2<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService2</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService1 testService1<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="多例的-setter-注入scope_prototype">多例的 setter
+注入(SCOPE_PROTOTYPE)</h3>
+<blockquote>
+<p>无法解决这种场景的循环依赖问题</p>
+</blockquote>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Scope</span><span class="token punctuation">(</span>ConfigurableBeanFactory<span class="token punctuation">.</span>SCOPE_PROTOTYPE<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService1</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService2 testService2<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Scope</span><span class="token punctuation">(</span>ConfigurableBeanFactory<span class="token punctuation">.</span>SCOPE_PROTOTYPE<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService2</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService1 testService1<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="构造器注入">构造器注入</h3>
+<blockquote>
+<p>无法解决这种场景的循环依赖问题</p>
+</blockquote>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService1</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token function">TestService1</span><span class="token punctuation">(</span>TestService2 testService2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService2</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token function">TestService2</span><span class="token punctuation">(</span>TestService1 testService1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>循环依赖出现原因流程图</strong></p>
+<p><img src="/2021/06/20/94f5629b61c4/image-20211129184215589.png" alt="image-20211129184215589" style="zoom:80%;"></p>
+<h3 id="dependson-循环依赖"><code>@DependsOn</code> 循环依赖</h3>
+<blockquote>
+<p>无法解决这种场景的循环依赖问题</p>
+</blockquote>
+<p>有些特殊的场景，比如我们需要在实例化Bean A之前，先实例化Bean
+B，这个时候就可以使用<code>@DependsOn</code>注解。</p>
+<p>这时候 Spring 会检查 <code>@DependsOn</code>
+的实例有没有循环依赖，如果有循环依赖则抛异常。</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@DependsOn</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"testService2"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService1</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService2 testService2<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@DependsOn</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"testService1"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService2</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService1 testService1<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="单例的代理对象setter注入async-等特殊情况产生的代理">单例的代理对象setter注入(<code>@Async</code>
+等特殊情况产生的代理)</h3>
+<blockquote>
+<p>有可能解决该场景下的循环依赖问题</p>
+</blockquote>
+<p>这种注入方式其实也比较常用，比如平时使用：<code>@Async</code>注解的场景，会通过<code>AOP</code>自动生成代理对象。</p>
+<p>如果使用 <code>@Aspect</code> 进行 <code>AOP</code>
+进行代理就不会出现该问题。</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService1</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService2 testService2<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Async</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestService2</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> TestService1 testService1<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>使用 <span class="citation" data-cites="Async">@Async</span>
+会抛出异常是因为生成代理对象的时刻是在
+<code>AbstractAdvisingBeanPostProcessor.postProcessAfterInitialization</code>
+，而不是在 <code>getEarlyBeanReference()</code> 生成的代理对象。如果使用
+<code>@Aspect</code> 进行 <code>AOP</code> ，代理对象就是在
+<code>getEarlyBeanReference()</code> 生成的这时候就不会出现该问题。</p>
+<p><img src="/2021/06/20/94f5629b61c4/image-20211129191444913.png" alt="image-20211129191444913" style="zoom:80%;"></p>
+<p>默认情况下，Spring
+是按照文件完整路径递归查找的，按路径+文件名排序，排在前面的先加载。所以
+TestService1 比 TestService2 先加载，最终导致 TestService1
+初始化实例完成会进行 <code>检查二级缓存中对象和原始对象是否相等</code>
+，由于 <span class="citation" data-cites="Async">@Async</span>
+生成代理对象的时刻不在 <code>getEarlyBeanReference()</code>
+导致对象不相等，因此抛异常。</p>
+<blockquote>
+<p>通过改变 Spring
+的依赖加载顺序（改文件名/用<code>@DependsOn</code>等）则有可能解决这个问题，但实际上这个问题还是存在的，只不过被绕过了。</p>
+</blockquote>
+<h2 id="出现循环依赖如何解决">出现循环依赖如何解决？</h2>
+<p>项目中如果出现循环依赖问题，说明是 Spring
+默认无法解决的循环依赖。目前包含下面几种情况：</p>
+<p><img src="/2021/06/20/94f5629b61c4/image-20211129192209291.png" alt="image-20211129192209291" style="zoom:80%;"></p>
+<h3 id="生成代理对象产生的循环依赖">生成代理对象产生的循环依赖</h3>
+<p>这类循环依赖问题解决方法很多，主要有：</p>
+<ol type="1">
+<li>使用<code>@Lazy</code>注解，延迟加载</li>
+<li>使用<code>@DependsOn</code>注解，指定加载先后关系</li>
+<li>修改文件名称，改变循环依赖类的加载顺序</li>
+</ol>
+<h3 id="使用-dependson-产生的循环依赖">使用 <code>@DependsOn</code>
+产生的循环依赖</h3>
+<p>这类循环依赖问题要找到<code>@DependsOn</code>注解循环依赖的地方，迫使它不循环依赖就可以解决问题。</p>
+<h3 id="多例循环依赖">多例循环依赖</h3>
+<p>这类循环依赖问题可以通过把 bean 改成单例的解决。</p>
+<h3 id="构造器循环依赖">构造器循环依赖</h3>
+<p>这类循环依赖问题可以通过使用<code>@Lazy</code>注解解决。</p>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2021/06/20/94f5629b61c4/%20风吹流年远%20Spring的循环依赖问题" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2021/06/20/e6e12673efa8/" title="Spring Security"><i class="fa fa-angle-double-left"></i>&nbsp;上一篇: Spring Security</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2021/06/20/1f2d34c02328/" title="Spring 中 Bean 的生命周期">下一篇: Spring 中 Bean 的生命周期&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

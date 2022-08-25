@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>风吹流年远</title><meta name="description" content="A Blog Powered By Hexo"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/" class="current">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-container"><p class="post-title"><a href="/2021/06/20/4509e3d26507/">排序算法</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/算法/" title="算法" class="a-tag">算法</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/排序/" title="排序" class="a-tag">排序</a><span>&nbsp;</span></span></p><p class="post-abstract">排序算法
+线性排序
+参考文章-数据结构与算法之美
+桶排序(Bucket sort)
+
+时间复杂度：O(n)
+
+桶排序，顾名思义，会用到“桶”，核心思想是将要排序的数据分到几个有序的桶里，每个桶里的数据再单独进行排序。桶内排完序之后，再把每个桶里的数据按照顺序依次取出，组成的序列就是有序的了。
+
+如果要排序的数据有...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/14a26e9c2eb8/">算法模板</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/算法/" title="算法" class="a-tag">算法</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/模板/" title="模板" class="a-tag">模板</a><span>&nbsp;</span></span></p><p class="post-abstract">算法模板
+复杂度分析
+算法分析中的常见函数
+
+算法分析中常用的近似函数
+
+根据增长的数量级函数作出的预测(倍率定理)
+
+应用
+各种排序算法的性能特点
+
+二叉树
+二叉树遍历
+中序遍历(inorder)
+
+中根次序遍历
+
+遍历顺序：递归地遍历左子树 -&gt; 根节点（父节点）
+-&gt; 递归地遍历右子树
+先序遍历...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/b44c81e90bf7/">算法问题分类合集</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/算法/" title="算法" class="a-tag">算法</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/问题分类/" title="问题分类" class="a-tag">问题分类</a><span>&nbsp;</span></span></p><p class="post-abstract">算法问题分类合集
+卡特兰数类型问题
+wiki
+问题汇总分析-算法入门笔记卡特兰数
+问题汇总-卡特兰数（Catalan
+number）（一）
+卡特兰数（Catalan number）是 组合数学
+中一个常出现在各种 计数问题 中的
+数列。
+数列的前几项为：1, 1, 2, 5, 14, 42, 132, 429, ...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/3a492374dddf/">Spring MVC 起步</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Spring-MVC/" title="Spring MVC" class="a-tag">Spring MVC</a><span>&nbsp;</span></span></p><p class="post-abstract">Spring MVC 起步
+参考文章-spring-docs
+状态管理、工作流以及验证都是基于 Web
+的应用程序需要解决的重要特性。HTTP
+协议的无状态性决定了这些问题都不那么容易解决。
+Spring 的 Web 框架就是为了解决这些问题而设计的。Spring MVC
+基于模型-视图-控制器 (Model-V...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/e6e12673efa8/">Spring Security</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Spring-Security/" title="Spring Security" class="a-tag">Spring Security</a><span>&nbsp;</span></span></p><p class="post-abstract">Spring Security
+参考文章-spring-docs
+参考文章-知乎
+Spring Security 是为基于 Spring
+的应用程序提供声明式安全保护的安全性框架。Spring Security
+提供了完整的安全性解决方案，它能够在 Web
+请求级别和方法调用级别处理身份认证和授权。
+Spring...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/94f5629b61c4/">Spring的循环依赖问题</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/循环依赖/" title="循环依赖" class="a-tag">循环依赖</a><span>&nbsp;</span></span></p><p class="post-abstract">Spring的循环依赖问题
+参考文章-Spring源码流程分析
+参考文章-Spring三级缓存分析
+参考文章-Spring循环依赖场景分析
+概念
+循环依赖：是一个或多个对象实例之间存在直接或间接的依赖关系，这种依赖关系构成了构成一个环形调用。
+循环依赖分为三种，自身依赖于自身、互相循环依赖、多组循环依赖。
+
+所以...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/1f2d34c02328/">Spring 中 Bean 的生命周期</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/生命周期/" title="生命周期" class="a-tag">生命周期</a><span>&nbsp;</span></span></p><p class="post-abstract">Spring 中 Bean 的生命周期
+对于普通的 Java 对象，当 new
+的时候创建对象，当它没有任何引用的时候被垃圾回收机制回收。而由 Spring
+IoC 容器托管的对象，它们的生命周期完全由容器控制。
+bean 装载到 Spring 应用上下文中的一个典型的生命周期如下：
+
+
+bean 在 Sprin...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/855bde794939/">SpringCore笔记</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Spring-Core/" title="Spring Core" class="a-tag">Spring Core</a><span>&nbsp;</span></span></p><p class="post-abstract">SpringCore笔记
+1. Spring
+官网 : http://spring.io/
+官方下载地址 :
+https://repo.spring.io/libs-release-local/org/springframework/spring/
+GitHub : https://github.com/spri...</p></div><div class="post-container"><p class="post-title"><a href="/2021/06/20/78d1148cb4a2/">微服务基础</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/微服务/" title="微服务" class="a-tag">微服务</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/微服务/" title="微服务" class="a-tag">微服务</a><span>&nbsp;</span></span></p><p class="post-abstract">微服务基础
+微服务接口设计原则
+高可用
+微服务接口设计原则
+CAP 定理
+2000 年，加州大学伯克利分校的计算机科学家 Eric
+Brewer
+在分布式计算原理研讨会（PODC）上提出了一个猜想，分布式系统有三个指标：
+ 
+它们的第一个字母分别是 C、A、P。
+
+Eric Brewer
+说，这三个指标最多只能同...</p></div><div class="post-container"><p class="post-title"><a href="/2021/03/04/c10e003a96df/">缓存基础</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-03-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/缓存/" title="缓存" class="a-tag">缓存</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/缓存/" title="缓存" class="a-tag">缓存</a><span>&nbsp;</span></span></p><p class="post-abstract">缓存整体介绍
+参考文章-缓存详细介绍
+参考文章-缓存更新策略
+参考文章-缓存底层原理
+概念
+缓存对高负载应用来说是至关重要的。一个典型的Web应用程序会提供大量的内容，直接生成这些内容的成本比采用缓存要高得多（包含检查和缓存超时的开销），所以采用缓存通常可以获得数量级的性能提升。诀窍是找到正确的粒度和缓存过期策略...</p></div><div class="pagination no-margin-bottom"><p class="clearfix"><p> 第 2 页 / 共 3 页 &nbsp;</p><p><span class="pre pagbuttons"><i class="fa fa-angle-double-left"></i>&nbsp;<a role="navigation" href="/" aria-label="上一页">上一页</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/page/3/" aria-label="下一页">下一页</a>&nbsp;<i class="fa fa-angle-double-right"></i></span></p></p></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

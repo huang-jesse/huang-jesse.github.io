@@ -1,0 +1,903 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>MySQL数据库系统原理 · 风吹流年远</title><meta name="description" content="MySQL数据库系统原理
+一、MySQL 逻辑架构
+MySQL 逻辑架构图：
+
+
+第一层架构是连接处理、授权认证、安全等服务。
+第二层架构包含大多数MySQL的核心服务功能，包括查询解析、分析、优化、缓存以及所有的内置函数（例如，日期、时间、数学和加密函数），所有跨存储引擎的功能都在这一层实现：存储"><meta name="og:description" content="MySQL数据库系统原理
+一、MySQL 逻辑架构
+MySQL 逻辑架构图：
+
+
+第一层架构是连接处理、授权认证、安全等服务。
+第二层架构包含大多数MySQL的核心服务功能，包括查询解析、分析、优化、缓存以及所有的内置函数（例如，日期、时间、数学和加密函数），所有跨存储引擎的功能都在这一层实现：存储"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="MySQL数据库系统原理"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>MySQL数据库系统原理</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-03-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/DB/" title="DB" class="a-tag">DB</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/数据库系统原理/" title="数据库系统原理" class="a-tag">数据库系统原理</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><h2 id="mysql数据库系统原理">MySQL数据库系统原理</h2>
+<h2 id="一mysql-逻辑架构">一、MySQL 逻辑架构</h2>
+<p>MySQL 逻辑架构图：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211229105825096.png" alt="image-20211229105825096" style="zoom:50%;"></p>
+<ul>
+<li>第一层架构是<strong>连接处理</strong>、授权认证、安全等服务。</li>
+<li>第二层架构包含大多数MySQL的<strong>核心服务功能</strong>，包括查询解析、分析、优化、缓存以及所有的内置函数（例如，日期、时间、数学和加密函数），所有跨存储引擎的功能都在这一层实现：存储过程、触发器、视图等。</li>
+<li>第三层包含了<strong>存储引擎</strong>。存储引擎负责MySQL中数据的存储和提取。和GNU/Linux下的各种文件系统一样，每个存储引擎都有它的优势和劣势。服务器通过API与存储引擎进行通信。这些接口屏蔽了不同存储引擎之间的差异，使得这些差异对上层的查询过程透明。存储引擎API包含几十个底层函数，用于执行诸如“开始一个事务”或者“根据主键提取一行记录”等操作。但存储引擎不会去解析SQL，不同存储引擎之间也不会相互通信，而只是简单地响应上层服务器的请求
+。</li>
+</ul>
+<h2 id="二事务">二、事务</h2>
+<p><a target="_blank" rel="noopener" href="https://jiang-hao.com/articles/2019/backend-transactions-acid.html">参考网址</a></p>
+<h3 id="概念">概念</h3>
+<ul>
+<li><p>在数据库管理系统（DBMS）中，事务是数据库恢复和并发控制的基本单位。它是一个操作序列，这些操作要么都执行，要么都不执行，它是一个不可分割的工作单位。</p></li>
+<li><p>事务是用来确保无论发生什么情况，你使用的数据都将处于一个一致性状态（合理的状态）。</p></li>
+<li><p>事务的出现了是为了应用层服务的，而不是数据库系统本身的需要
+。</p></li>
+</ul>
+<h3 id="事务的状态">事务的状态</h3>
+<h4 id="从外部看">从外部看</h4>
+<p>因为事务具有原子性，所以从外部看的话，事务就是一个不可分割的工作单位，事务的状态也只有三种：Active、Commited
+和 Failed，事务要不就在执行中，要不然就是成功或者失败的状态。</p>
+<h4 id="内部看">内部看</h4>
+<p>具体来说，事务有以下几种可能的状态：</p>
+<ul>
+<li>Active：事务的初始状态，表示事务正在执行；</li>
+<li>Partially Committed：部分提交；</li>
+<li>Failed：发现事务无法正常执行之后；</li>
+<li>Aborted：事务被回滚并且数据库恢复到了事务进行之前的状态之后；</li>
+<li>Committed：成功执行整个事务。
+我们也可以看到，事务在执行之后只会以Aborted或者Committed状态作为结束。</li>
+</ul>
+<h3 id="acid">ACID</h3>
+<p><a target="_blank" rel="noopener" href="https://jiang-hao.com/articles/2019/backend-transactions-acid.html">事务参考</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/31346392">一致性参考</a></p>
+<h4 id="acid简介">ACID简介</h4>
+<p>为了保持数据库的一致性，在事务处理之前和之后，都遵循某些属性，也就是大家耳熟能详的ACID属性：</p>
+<ul>
+<li><strong>原子性（Atomicity）</strong>：一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚，对于一个事务来说，不可能只执行其中的一部分操作，这就是事务的原子性。<br>
+</li>
+<li><strong>一致性（Consistency）</strong>：事务的执行前后，数据库总是从一个一致性的状态转换到另外一个一致性的状态。<br>
+</li>
+<li><strong>隔离性（Isolation）</strong>：通常来说，一个事务所做的修改在最终提交以前，对其他事务是不可见的。（但是根据不同的隔离级别，表现有所不同。）<br>
+</li>
+<li><strong>持久性（Durability）</strong>：一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。</li>
+</ul>
+<h4 id="重点">重点</h4>
+<p>ACID里的AID都是数据库的特征，也就是依赖数据库的具体实现。而唯独这个C,实际上它依赖于应用层，也就是依赖于开发者。这里的一致性是指系统从一个一致性的状态，迁移到另一个一致性的状态。什么叫一致性的状态呢？就是当前的状态满足预定的约束就叫做一致性的状态。而事务具备ACID里C的特性是说通过事务的AID来保证我们的一致性。</p>
+<h4 id="事务的目的">事务的目的</h4>
+<ul>
+<li>一致性既是事务的属性，也是事务的目的。</li>
+<li>一致性是事务ACID四大特性中最重要的属性，而原子性、隔离性和持久性，都是作为保障一致性的手段。事务作为这些性质的载体，实现了这种由AID保障C的机制。</li>
+</ul>
+<h4 id="数据一致性的破坏来源及解决">数据一致性的破坏来源及解决</h4>
+<ul>
+<li><p>对数据一致性的破坏主要来自两个方面： 事务的并发执行
+事务故障或系统故障</p></li>
+<li><p>数据库系统是通过并发控制技术和日志恢复技术来避免这种情况发生的。</p></li>
+</ul>
+<p>并发控制技术保证了事务的隔离性，使数据库的一致性状态不会因为并发执行的操作被破坏。</p>
+<p>日志恢复技术保证了事务的原子性，使一致性状态不会因事务或系统故障被破坏。同时使已提交的对数据库的修改不会因系统崩溃而丢失，保证了事务的持久性。</p>
+<h2 id="三并发一致性问题">三、并发一致性问题</h2>
+<p>当多个用户/进程/线程同时对数据库进行操作时，会出现3种冲突情形：</p>
+<ul>
+<li><p>读-读，不存在任何问题</p></li>
+<li><p>读-写，有隔离性问题，可能遇到脏读（会读到未提交的数据）
+，幻影读等。</p></li>
+<li><p>写-写，可能丢失修改（丢失更新）</p></li>
+</ul>
+<h4 id="丢失修改">丢失修改</h4>
+<p>丢失修改指一个事务的更新操作被另外一个事务的更新操作替换。一般在现实生活中常会遇到，例如：T1
+和 T2 两个事务都对一个数据进行修改，T1 先修改并提交生效，T2 随后修改，T2
+的修改覆盖了 T1 的修改。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20191207221744244.png" alt="img" style="zoom:50%;"></p>
+<h4 id="脏读">脏读</h4>
+<p>在T1事务读取到了还未提交的T2事务中更新后的数据，然后T2事务被回滚了。但此时T1事务仍然根据读取到的脏数据进行更新处理。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20191207221920368.png" alt="img" style="zoom: 50%;"></p>
+<h4 id="不可重复读"><strong>不可重复读</strong></h4>
+<p>在同一个事务中，两次读取到的数据不一致。比如事务T1，第一次查询到<code>a=10</code>，然后此时事务T2更新了<code>a=20</code>。接着事务T1第二次查询到<code>a=20</code>，这就出现了不可重复读问题。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20191207222102010.png" alt="img" style="zoom:50%;"></p>
+<h4 id="幻影读"><strong>幻影读</strong></h4>
+<p>在同一个事务中，两次读取的数据范围不一致。比如事务T1读取某个范围的数据，接着事务T2向这个范围内插入了一笔数据，然后T1再次读取这个范围的数据，先后两次读取的数据结果不一致。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20191207222134306.png" alt="img" style="zoom:50%;"></p>
+<h4 id="不可重复读与幻影读的区别"><strong>不可重复读与幻影读的区别</strong></h4>
+<p><strong>提交读隔离级别：</strong>此级别在一个事务中只允许读到其他事务已经提交过的值，看不到其他事务的中间值。但这样也有问题，就是在同事务中<strong>前后两次select有可能会返回不同的结果</strong>，即同一事务中第一次select以后，如果中间有其他事务提交了对相关数据的修改，那么第二次select就会看到新的值，与第一次select不一致。术语"<strong>不可重复读</strong>"指的就是这种情况，重复读即多次select,
+不可重复读就是多次select的结果可能是不一样的。</p>
+<p><strong>可重复读隔离级别：</strong>可重复读这一级别保证了在同一个事务中，<strong>第一次select到的数据</strong>，在后续select中仍然保持不变。重点在于，它保证的是对于<strong>第一次读到</strong>的数据，后续再对这些数据的读操作会返回相同的结果。它的问题在于范围查询。比如第一次读到了A,
+B两条记录，那么可重复读<strong>仅能保证再执行同样的查询时，返回的A,
+B记录跟之前的一样</strong>，而不保证其他记录。这里的其他记录是指在两次查询之间有其他事务在中间插入了新记录，这些新记录刚好与你的where条件匹配，这样一来虽然第二次查询也返回了跟之前一样的A,
+B，但可能会多了C, D, E等新记录，这就叫<strong>幻影读</strong>。</p>
+<blockquote>
+<p>产生并发不一致性问题的主要原因是破坏了事务的隔离性，解决方法是通过并发控制来保证隔离性。并发控制可以通过封锁来实现，但是封锁操作需要用户自己控制，相当复杂。数据库管理系统提供了事务的隔离级别，让用户以一种更轻松的方式处理并发一致性问题。</p>
+</blockquote>
+<h2 id="四封锁">四、封锁</h2>
+<blockquote>
+<p>MySQL InnoDB 存储引擎</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html">官方文档</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/29150809">参考文章-知乎</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000011164489">参考文章-思否</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45320660/article/details/117663803">参考文章-锁介绍</a></p>
+<h3 id="封锁粒度">封锁粒度</h3>
+<p>InnoDB
+存储引擎既支持行级锁，也支持表级锁，但默认情况下是采用行级锁。</p>
+<h4 id="表级锁table-level-locking">表级锁（table-level locking）</h4>
+<p>开销小，加锁快；不会出现死锁；锁定粒度大，发生锁冲突的概率最高，并发度最低。</p>
+<blockquote>
+<p>这些存储引擎通过总是一次性同时获取所有需要的锁以及总是按相同的顺序获取表锁来避免死锁。</p>
+<p>表级锁更适合于以查询为主，并发用户少，只有少量按索引条件更新数据的应用，如Web
+应用。</p>
+</blockquote>
+<p><strong>获取 InnoDB 表锁争用情况</strong></p>
+<ul>
+<li><p>通过 <code>show open tables</code> 查看哪些表被加锁。</p></li>
+<li><p>通过检查 <code>innodb_row_lock</code>
+状态变量来分析系统上的表锁的争用情况：</p></li>
+</ul>
+<pre class="line-numbers language-shell"><code class="language-shell">mysql&gt; show status like 'table_locks%'; <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="行级锁row-level-locking">行级锁（row-level locking）</h4>
+<p>开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度也最高。</p>
+<blockquote>
+<p>在 InnoDB 中，除单个 SQL 组成的事务外，锁是逐步获得的，这就决定了在
+InnoDB 中发生死锁是可能的。</p>
+<p>行级锁只在存储引擎层实现，而Mysql服务器层没有实现。
+行级锁更适合于有大量按索引条件并发更新少量不同数据，同时又有并发查询的应用，如一些在线事务处理（OLTP）系统。</p>
+</blockquote>
+<p><strong>获取 InnoDB 行锁的争用情况</strong></p>
+<ul>
+<li>通过检查 <code>innodb_row_lock</code>
+状态变量来分析系统上的行锁的争用情况：</li>
+</ul>
+<pre class="line-numbers language-shell"><code class="language-shell">mysql&gt; show status like 'innodb_row_lock%'; <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="innodb-行级锁策略">InnoDB 行级锁策略</h4>
+<ul>
+<li>记录锁/行锁（Record Locks）：记录锁锁定索引中一条记录。</li>
+<li>间隙锁（Gap
+Locks）：间隙锁要么锁住索引记录中间的值，要么锁住第一个索引记录前面的值或者最后一个索引记录后面的值。</li>
+<li>Next-Key
+Locks：Next-Key锁是索引记录上的记录锁和在索引记录之前的间隙锁的组合。</li>
+</ul>
+<h4 id="innodb-行锁实现方式">InnoDB 行锁实现方式</h4>
+<ul>
+<li>InnoDB 行锁是通过给索引上的索引项加锁来实现的，这一点 MySQL 与
+Oracle 不同，后者是通过在数据块中对相应数据行加锁来实现的。InnoDB
+这种行锁实现特点意味着：只有通过索引条件检索数据，InnoDB
+才使用行级锁，否则，InnoDB 将使用表锁（<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/355262012/answer/2224669390">应该是对全表的每行记录加锁，而不是直接加表锁</a>）！</li>
+<li>不论是使用主键索引、唯一索引或普通索引，InnoDB
+都会使用行锁来对数据加锁。</li>
+<li>只有执行计划真正使用了索引，才能使用行锁：即便在条件中使用了索引字段，但是否使用索引来检索数据是由
+MySQL 通过判断不同执行计划的代价来决定的，如果 MySQL
+认为全表扫描效率更高，比如对一些很小的表，它就不会使用索引，这种情况下
+InnoDB 将使用表锁，而不是行锁。因此，在分析锁冲突时， 别忘了检查 SQL
+的执行计划（可以通过 explain 检查 SQL
+的执行计划），以确认是否真正使用了索引。（更多阅读：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s/h4B84UmzAUJ81iBY_FXNOg">MySQL索引总结</a>）</li>
+<li>由于 MySQL
+的行锁是针对索引加的锁，不是针对记录加的锁，所以虽然多个session是访问不同行的记录，
+但是如果是使用相同的索引键，
+是会出现锁冲突的（后使用这些索引的session需要等待先使用索引的session释放锁后，才能获取锁）。
+应用设计的时候要注意这一点。</li>
+</ul>
+<h3 id="封锁类型">封锁类型</h3>
+<h4 id="读写锁">1. 读写锁</h4>
+<ul>
+<li>互斥锁（Exclusive），简写为 X 锁，又称写锁。</li>
+<li>共享锁（Shared），简写为 S 锁，又称读锁。</li>
+</ul>
+<p>有以下两个规定：</p>
+<ul>
+<li>一个事务对数据对象 A 加了 X 锁，就可以对 A
+进行读取和更新。加锁期间其它事务不能对 A 加任何锁。</li>
+<li>一个事务对数据对象 A 加了 S 锁，可以对 A
+进行读取操作，但是不能进行更新操作。加锁期间其它事务能对 A 加 S
+锁，但是不能加 X 锁。</li>
+</ul>
+<p>锁的兼容关系如下：</p>
+<figure>
+<img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/image-20191207213523777.png" alt="img">
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h4 id="意向锁表级锁">2. 意向锁（表级锁）</h4>
+<blockquote>
+<p>意向锁是 InnoDB 自动加的， 不需用户干预</p>
+</blockquote>
+<p>使用意向锁（Intention Locks）可以更容易地支持多粒度封锁。</p>
+<p>在存在行级锁和表级锁的情况下，事务 T 想要对表 A 加 X
+锁，就需要先检测是否有其它事务对表 A 或者表 A
+中的任意一行加了锁，那么就需要对表 A
+的每一行都检测一次，这是非常耗时的。</p>
+<p>意向锁在原来的 X/S 锁之上引入了 IX/IS，<strong>IX/IS
+都是表锁</strong>，<strong>用来表示一个事务想要在表中的某个数据行上加 X
+锁或 S 锁</strong>。有以下两个规定：</p>
+<ul>
+<li>一个事务在获得某个数据行对象的 S 锁之前，必须先获得表的 IS
+锁或者更强的锁；</li>
+<li>一个事务在获得某个数据行对象的 X 锁之前，必须先获得表的 IX 锁。</li>
+</ul>
+<p>通过引入意向锁，事务 T 想要对表 A 加 X
+锁，只需要先检测是否有其它事务对表 A 加了 X/IX/S/IS
+锁，如果加了就表示有其它事务正在使用这个表或者表中某一行的锁，因此事务 T
+加 X 锁失败。</p>
+<p><strong>各种锁（这里指表级锁）</strong>的兼容关系如下：</p>
+<figure>
+<img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/image-20191207214442687.png" alt="img">
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>解释如下：</p>
+<ul>
+<li>任意 IS/IX
+锁之间都是兼容的，因为它们只表示想要对表加锁，而不是真正加锁；</li>
+<li><strong>这里兼容关系针对的是表级锁，而表级的 IX 锁和行级的 X
+锁兼容，两个事务可以对两个数据行加 X 锁。</strong>（事务 T1 想要对数据行
+R1 加 X 锁，事务 T2 想要对同一个表的数据行 R2 加 X
+锁，两个事务都需要对该表加 IX 锁，但是 IX 锁是兼容的，并且 IX 锁与行级的
+X
+锁也是兼容的，因此两个事务都能加锁成功，对同一个表中的两个数据行做修改。）</li>
+</ul>
+<h3 id="封锁协议">封锁协议</h3>
+<h4 id="三级封锁协议">1. 三级封锁协议</h4>
+<p><strong>一级封锁协议</strong></p>
+<p>事务 T 要修改数据 A 时必须加 X 锁，直到 T 结束才释放锁。</p>
+<p>可以解决丢失修改问题，因为不能同时有两个事务对同一个数据进行修改，那么事务的修改就不会被覆盖。</p>
+<figure>
+<img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/image-20191207220440451.png" alt="img">
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p><strong>二级封锁协议</strong></p>
+<p>在一级的基础上，要求读取数据 A 时必须加 S 锁，<strong>读取完马上释放
+S 锁</strong>。</p>
+<p>可以解决读脏数据问题，因为如果一个事务在对数据 A 进行修改，根据 1
+级封锁协议，会加 X 锁，那么就不能再加 S 锁了，也就是不会读入数据。</p>
+<figure>
+<img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/image-20191207220831843.png" alt="img">
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p><strong>三级封锁协议</strong></p>
+<p>在二级的基础上，要求读取数据 A 时必须加 S
+锁，<strong>直到事务结束了才能释放 S 锁</strong>。</p>
+<p>可以解决不可重复读的问题，因为读 A 时，其它事务不能对 A 加 X
+锁，从而避免了在读的期间数据发生改变。</p>
+<figure>
+<img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/image-20191207221313819.png" alt="img">
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h4 id="两段锁协议">2. 两段锁协议</h4>
+<p><a target="_blank" rel="noopener" href="https://my.oschina.net/alchemystar/blog/1438839">参考文章</a></p>
+<p>两段锁协议(2PL)是指事务的执行可以分为两个阶段：生长阶段Growing
+Phase（加锁阶段）和衰退阶段Shrinking Phase（解锁阶段）：</p>
+<ul>
+<li>加锁阶段：在该阶段可以进行加锁操作。在对任何数据进行读操作之前要申请并获得读锁，在进行写操作之前要申请并获得写锁。加锁不成功，则事务进入等待状态，直到加锁成功才继续执行。</li>
+<li>解锁阶段：当事务释放了一个封锁以后，事务进入解锁阶段，在该阶段只能进行解锁操作不能再进行加锁操作。</li>
+</ul>
+<p><img src="/2022/03/20/2c8f729b6f23/17105307_MZJc.png" alt="输入图片说明" style="zoom:50%;"></p>
+<p>在数学上可以证明（参照《事务处理:概念与技术》这本书的7.5.8.2节），若并发执行的所有事务均遵守两段锁协议，则对<strong>这些事务的任何并发调度策略都是可串行化的</strong>。</p>
+<blockquote>
+<p>需要注意的是2PL可能会有死锁问题，需要有死锁检测和防范机制。</p>
+</blockquote>
+<p>可串行化调度是指，通过并发控制，使得并发执行的事务结果与某个串行执行的事务结果相同。串行执行的事务互不干扰，不会出现并发一致性问题。</p>
+<p><strong>事务遵循两段锁协议是保证可串行化调度的充分条件</strong>。例如以下操作满足两段锁协议，它是可串行化调度。</p>
+<pre class="line-numbers language-html"><code class="language-html">lock-x(A)...lock-s(B)...lock-s(C)...unlock(A)...unlock(C)...unlock(B)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>但不是必要条件，例如以下操作不满足两段锁协议，但它还是可串行化调度。</p>
+<pre class="line-numbers language-html"><code class="language-html">lock-x(A)...unlock(A)...lock-s(B)...unlock(B)...lock-s(C)...unlock(C)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="mysql-隐式与显式锁定">MySQL 隐式与显式锁定</h3>
+<p>MySQL 的 InnoDB
+存储引擎采用两段锁协议，会根据隔离级别在需要的时候自动加锁，并且所有的锁都是在同一时刻被释放，这被称为隐式锁定。</p>
+<p>InnoDB 也可以使用特定的语句进行显示锁定：</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token keyword">LOCK</span> <span class="token operator">In</span> <span class="token keyword">SHARE MODE</span><span class="token punctuation">;</span>
+<span class="token keyword">SELECT</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token keyword">FOR</span> <span class="token keyword">UPDATE</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="死锁deadlock-free">死锁（Deadlock Free）</h3>
+<h4 id="死锁">死锁</h4>
+<p><strong>死锁产生</strong></p>
+<p>死锁是指两个或多个事务在同一资源上相互占用，并请求锁定对方占用的资源，从而导致恶性循环。当事务试图以不同的顺序锁定资源时，就可能产生死锁。多个事务同时锁定同一个资源时也可能会产生死锁。</p>
+<p>锁的行为和顺序和存储引擎相关。以同样的顺序执行语句，有些存储引擎会产生死锁有些不会——<strong>死锁有双重原因：真正的数据冲突；存储引擎的实现方式。</strong></p>
+<p><strong>检测死锁</strong></p>
+<p>数据库系统实现了各种死锁检测和死锁超时的机制。InnoDB存储引擎能检测到死锁的循环依赖并立即返回一个错误。</p>
+<p><strong>死锁恢复</strong></p>
+<p>死锁发生以后，只有部分或完全回滚其中一个事务，才能打破死锁，InnoDB目前处理死锁的方法是，将持有最少行级排他锁的事务进行回滚。所以事务型应用程序在设计时必须考虑如何处理死锁，多数情况下只需要重新执行因死锁回滚的事务即可。</p>
+<p><strong>外部锁的死锁检测</strong></p>
+<p>发生死锁后，InnoDB
+一般都能自动检测到，并使一个事务释放锁并回退，另一个事务获得锁，继续完成事务。但在涉及外部锁，或涉及表锁的情况下，InnoDB
+并不能完全自动检测到死锁， 这需要通过设置锁等待超时参数
+innodb_lock_wait_timeout 来解决。</p>
+<p><strong>死锁影响性能</strong></p>
+<p>死锁会影响性能而不是会产生严重错误，因为InnoDB会自动检测死锁状况并回滚其中一个受影响的事务。在高并发系统上，当许多线程等待同一个锁时，死锁检测可能导致速度变慢。
+有时当发生死锁时，禁用死锁检测（使用innodb_deadlock_detect配置选项）可能会更有效，这时可以依赖innodb_lock_wait_timeout设置进行事务回滚。</p>
+<h4 id="innodb避免死锁"><strong>InnoDB避免死锁</strong></h4>
+<ul>
+<li>为了在单个InnoDB表上执行多个并发写入操作时避免死锁，可以在事务开始时通过为预期要修改的每个元祖（行）使用SELECT
+... FOR
+UPDATE语句来获取必要的锁，即使这些行的更改语句是在之后才执行的。</li>
+<li>在事务中，如果要更新记录，应该直接申请足够级别的锁，即排他锁，而不应先申请共享锁、更新时再申请排他锁，因为这时候当用户再申请排他锁时，其他事务可能又已经获得了相同记录的共享锁，从而造成锁冲突，甚至死锁。</li>
+<li>如果事务需要修改或锁定多个表，则应在每个事务中以相同的顺序使用加锁语句。
+在应用中，如果不同的程序会并发存取多个表，应尽量约定以相同的顺序来访问表，这样可以大大降低产生死锁的机会</li>
+<li>改变事务隔离级别</li>
+</ul>
+<p>如果出现死锁，可以用 SHOW INNODB STATUS
+命令来确定最后一个死锁产生的原因。返回结果中包括死锁相关事务的详细信息，如引发死锁的
+SQL
+语句，事务已经获得的锁，正在等待什么锁，以及被回滚的事务等。据此可以分析死锁产生的原因和改进措施。</p>
+<h3 id="一些优化锁性能的建议">一些优化锁性能的建议</h3>
+<ul>
+<li>尽量使用较低的隔离级别。</li>
+<li>精心设计索引， 并尽量使用索引访问数据， 使加锁更精确，
+从而减少锁冲突的机会。</li>
+<li>选择合理的事务大小，小事务发生锁冲突的几率也更小。</li>
+<li>给记录集显示加锁时，最好一次性请求足够级别的锁。比如要修改数据的话，最好直接申请排他锁，而不是先申请共享锁，修改时再请求排他锁，这样容易产生死锁。</li>
+<li>不同的程序访问一组表时，应尽量约定以相同的顺序访问各表，对一个表而言，尽可能以固定的顺序存取表中的行。这样可以大大减少死锁的机会</li>
+<li>尽量用相等条件访问数据，这样可以避免间隙锁对并发插入的影响</li>
+<li>不要申请超过实际需要的锁级别</li>
+<li>除非必须，查询时不要显示加锁。
+MySQL的MVCC可以实现事务中的查询不用加锁，优化事务性能；MVCC只在COMMITTED
+READ（读提交）和REPEATABLE READ（可重复读）两种隔离级别下工作</li>
+<li>对于一些特定的事务，可以使用表锁来提高处理速度或减少死锁的可能</li>
+</ul>
+<h2 id="五事务隔离级别">五、事务隔离级别</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/CyC2018/CS-Notes/blob/master/notes/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86.md#%E4%BA%8C%E5%B9%B6%E5%8F%91%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98">参考地址</a></p>
+<p>所谓隔离级别（Isolation
+Level），就是在数据库事务中，为保证并发数据读写的正确性而提出的定义，它并不是
+MySQL
+专有的概念，而是源于ANSI/ISO制定的SQL-92标准。每种关系型数据库都提供了各自特色的隔离级别实现，虽然在通常的定义中是以锁为实现单元，但实际的实现千差万别。以最常见的
+MySQL InnoDB 引擎为例，它是基于MVCC（Multi-Versioning Concurrency
+Control）和锁的复合实现，按照隔离程度从低到高，MySQL
+事务隔离级别分为四个不同层次。</p>
+<h4 id="未提交读read-uncommitted"><strong>未提交读（READ
+UNCOMMITTED）</strong></h4>
+<p>事务中的修改，即使未提交对其他事务也是可见的。</p>
+<p>就是一个事务能够看到其他事务尚未提交的修改，这是最低的隔离水平，<strong>允许脏读</strong>出现。</p>
+<blockquote>
+<p>这个级别会导致很多问题，从性能上来说，READ UNCOMMITTED
+不会比其他的级别好太多，但却缺乏其他级别的很多好处，除非真的有非常必要的理由，在实际应用中一般很少使用。</p>
+</blockquote>
+<h4 id="提交读read-committed"><strong>提交读（READ
+COMMITTED）</strong></h4>
+<blockquote>
+<p>解决：脏读问题</p>
+</blockquote>
+<p>事务能够看到的数据都是其他事务已经提交的修改，也就是保证不会看到任何中间性状态，当然脏读也不会出现。读已提交仍然是比较低级别的隔离，并不保证再次读取时能够获取同样的数据，也就是允许其他事务并发修改数据，<strong>允许不可重复读和幻影读（Phantom
+Read）</strong>出现。</p>
+<blockquote>
+<p>大部分数据库的默认隔离级别</p>
+</blockquote>
+<h4 id="可重复读repeatable-read"><strong>可重复读（REPEATABLE
+READ）</strong></h4>
+<blockquote>
+<p>解决：脏读和不可重复读问题</p>
+</blockquote>
+<p>保证在同一个事务中多次读取同一数据的结果是一样的，<strong>一般情况下会出现幻影读</strong>（但在
+MySQL 中该隔离级别下，通过 MVCC 以及加锁解决了幻影读问题）。</p>
+<blockquote>
+<p>这是MySQL InnoDB 引擎的默认隔离级别</p>
+</blockquote>
+<h4 id="可串行化serializable"><strong>可串行化（SERIALIZABLE）</strong></h4>
+<blockquote>
+<p>解决：脏读，不可重复读和幻影读问题</p>
+</blockquote>
+<p>强制事务串行执行，这样多个事务互不干扰，不会出现并发一致性问题。</p>
+<p>并发事务之间是串行化的，通常意味着读取需要获取共享读锁，更新需要获取排他写锁，如果
+SQL 使用 WHERE 语句，还会获取间隙锁（MySQL以 GAP
+锁形式实现，可重复读级别中默认也会使用），这是最高的隔离级别。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211224155339158.png" alt="image-20211224155339158" style="zoom:50%;"></p>
+<h2 id="六悲观锁和乐观锁">六、悲观锁和乐观锁</h2>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/d2ac26ca6525">参考文章</a></p>
+<p>乐观锁和悲观锁是两种思想，用于解决并发场景下的<strong>数据竞争（写-写冲突）问题</strong>。</p>
+<h4 id="乐观锁optimistic-concurrency-control-occ">乐观锁(Optimistic
+Concurrency Control OCC)</h4>
+<blockquote>
+<p>适用于读多写少的场景，乐观锁不能解决脏读的问题。</p>
+</blockquote>
+<p>乐观锁在更新数据时比较乐观，假设别人不会同时修改数据。所以在数据进行提交更新的时候，才会正式对数据的冲突与否进行检测，如果冲突，则返回给用户异常信息，让用户决定如何去做。乐观锁本身不加锁，乐观锁适用于读多写少的场景，这样可以提高程序的吞吐量。</p>
+<p><strong>乐观锁的实现</strong></p>
+<ul>
+<li><p>CAS 实现：Java
+中java.util.concurrent.atomic包下面的原子变量使用了乐观锁的一种 CAS
+实现方式。</p></li>
+<li><p>版本号控制：一般是在数据表中加上一个数据版本号 version
+字段，表示数据被修改的次数。当数据被修改时，version 值会 +1。当线程 A
+要更新数据时，在读取数据的同时也会读取 version
+值，在提交更新时，若刚才读取到的 version 值与当前数据库中的 version
+值相等时才更新，否则重试更新操作，直到更新成功。</p></li>
+</ul>
+<p><strong>乐观锁的应用场景</strong></p>
+<ul>
+<li>Java 中的 AtomicInteger 原子类</li>
+</ul>
+<p><strong>说明</strong></p>
+<p>乐观并发控制相信事务之间的数据竞争(data
+race)的概率是比较小的，因此尽可能直接做下去，直到提交的时候才去检测冲突，所以不会产生任何锁和死锁。但是在竞争激烈的场景下，会产生进行的失败重试。</p>
+<h4 id="悲观锁pessimistic-concurrency-control-pcc">悲观锁(Pessimistic
+Concurrency Control PCC)</h4>
+<blockquote>
+<p>适用于写多读少的场景</p>
+</blockquote>
+<p>悲观锁在更新数据时比较悲观，认为别人会同时修改数据。因此操作数据时直接把数据锁住，直到操作完成后才会释放锁，上锁期间其他人不能修改数据。</p>
+<p><strong>悲观锁的实现</strong></p>
+<ul>
+<li><p>传统的关系型数据库使用这种锁机制，比如行锁、表锁、读锁、写锁等，都是在操作之前先上锁。</p></li>
+<li><p>Java 里面的同步 synchronized 关键字的实现。</p></li>
+</ul>
+<p><strong>悲观锁的应用场景</strong></p>
+<ul>
+<li>二阶段封锁(2PL)是一种悲观锁的应用场景（有可能产生死锁，需要死锁检测和防范机制）</li>
+</ul>
+<p><strong>说明</strong></p>
+<p>悲观并发控制实际上是“先加锁再访问”的保守策略，为数据处理的安全提供了保证。但是在效率方面，处理加锁的机制会让<strong>数据库产生额外的开销</strong>，还有<strong>增加产生死锁</strong>的机会。另外还会降低并行性，一个事务如果锁定了某行数据，其他事务就必须等待该事务处理完才可以处理那行数据。</p>
+<h4 id="悲观锁和乐观锁对比">悲观锁和乐观锁对比</h4>
+<p>在乐观锁与悲观锁的选择上面，主要看下两者的区别以及适用场景就可以了。</p>
+<ul>
+<li><p>响应效率：如果需要非常高的响应速度，建议采用乐观锁方案，成功就执行，不成功就失败，不需要等待其他并发去释放锁。乐观锁并未真正加锁，效率高。一旦锁的粒度掌握不好，更新失败的概率就会比较高，容易发生业务失败。</p></li>
+<li><p>冲突频率：如果冲突频率非常高，建议采用悲观锁，保证成功率。冲突频率大，选择乐观锁会需要多次重试才能成功，代价比较大。</p></li>
+<li><p>重试代价：如果重试代价大，建议采用悲观锁。悲观锁依赖数据库锁，效率低。更新失败的概率比较低。</p></li>
+<li><p>乐观锁如果有人在你之前更新了，你的更新应当是被拒绝的，可以让用户重新操作。悲观锁则会等待前一个更新完成。这也是区别。</p></li>
+</ul>
+<p>随着互联网三高架构(高并发、高性能、高可用)的提出，悲观锁已经越来越少的被应用到生产环境中了，尤其是并发量比较大的业务场景。</p>
+<h2 id="七多版本并发控制mvcc">七、多版本并发控制(MVCC)</h2>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/52977862">流程参考-知乎</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/381453518">细节参考-知乎</a></p>
+<h3 id="基本思想">基本思想</h3>
+<p>多版本并发控制（MVCC）是一种用来<strong>解决读-写冲突</strong>的无锁并发控制，也就是为事务分配单向增长的时间戳，为每个修改保存一个版本，版本与事务时间戳关联，读操作只读该事务开始前的数据库的快照。
+这样在读操作不用阻塞写操作，写操作不用阻塞读操作的同时，避免了脏读和不可重复读。</p>
+<h3 id="主要的优点">主要的优点</h3>
+<ul>
+<li>Writes do not block readers （写不会阻塞读）</li>
+<li>Read-only transactions can read a consistent snapshot without
+acquiring locks （只读的事务不需要加锁，就可以获得一致性的快照）</li>
+<li>Easily support time-travel queries （天然支持time-travel)</li>
+</ul>
+<h3 id="mvcc实现的核心知识点">MVCC实现的核心知识点</h3>
+<ul>
+<li><p>事务版本号</p></li>
+<li><p>表的隐藏列</p></li>
+<li><p>undo log</p></li>
+<li><p>read view</p></li>
+</ul>
+<h4 id="事务版本号">1. 事务版本号</h4>
+<p>每次事务开启前都会从数据库获得一个自增长的事务ID，可以从事务ID判断事务的执行先后顺序。</p>
+<h4 id="表格的隐藏列三个隐式字段">2. 表格的隐藏列（三个隐式字段）</h4>
+<p><strong>DB_TRX_ID:</strong> 记录操作该数据的事务ID；</p>
+<p><strong>DB_ROLL_PTR：</strong>指向上一个版本数据在 undo log
+里的位置指针；</p>
+<p><strong>DB_ROW_ID:</strong> 隐藏ID
+，当创建表没有合适的索引作为聚集索引时，会用该隐藏ID创建聚集索引;</p>
+<h4 id="undo-log">3. Undo log</h4>
+<p>Undo log
+主要用于记录数据被修改之前的日志，在表信息修改之前先会把数据拷贝到undo
+log 里，当事务进行回滚时可以通过undo log 里的日志进行数据还原。</p>
+<p><strong>Undo log 的用途</strong></p>
+<ul>
+<li><p>保证事务进行rollback时的原子性和一致性，当事务进行回滚的时候可以用undo
+log的数据进行恢复。</p></li>
+<li><p>用于MVCC快照读的数据，在MVCC多版本控制中，通过读取undo
+log的历史版本数据可以实现不同事务版本号都拥有自己独立的快照数据版本。</p></li>
+</ul>
+<h4 id="事务版本号表格的隐藏列undo-log的关系">4.
+事务版本号、表格的隐藏列、undo log的关系</h4>
+<p>我们模拟一次数据修改的过程来让我们了解下事务版本号、表格隐藏的列和undo
+log他们之间的使用关系。</p>
+<p><strong>4.1. 首先准备一张原始原始数据表</strong></p>
+<p><img src="/2022/03/20/2c8f729b6f23/v2-aebde29dc2e7b2dc76d5e6a42698f3b2_1440w.jpg" alt="img" style="zoom:80%;"></p>
+<p><strong>4.2. 开启一个事务A</strong></p>
+<p>对user_info表执行
+<code>update user_info set name = "李四" where id = 1</code>
+会进行如下流程操作</p>
+<ul>
+<li><p>首先获得一个事务编号 104</p></li>
+<li><p>把user_info表修改前的数据拷贝到undo log</p></li>
+<li><p>修改user_info表 id=1的数据</p></li>
+<li><p>把修改后的数据事务版本号改成 当前事务版本号，并把DB_ROLL_PTR
+地址指向undo log数据地址。</p></li>
+</ul>
+<p><strong>4.3. 最后执行完结果如图：</strong></p>
+<p><img src="/2022/03/20/2c8f729b6f23/v2-1daaeab59495ff3378dae24ea21dc158_1440w.jpg" alt="img" style="zoom:80%;"></p>
+<h4 id="readview">5. ReadView</h4>
+<p>在 innodb 中每个事务开启后都会得到一个 read_view
+。副本主要保存了当前数据库系统中正处于活跃（没有commit）的事务的ID号，其实简单的说这个副本中保存的是系统中当前不应该被本事务看到的其他事务id列表。</p>
+<p><strong>5.1. ReadView 的几个重要属性</strong></p>
+<p><strong>trx_ids:</strong> 当前系统活跃(未提交)事务版本号集合。</p>
+<p><strong>low_limit_id:</strong> 创建当前read view
+时“当活跃事务中的<strong>最大事务版本号</strong>+1”。</p>
+<p><strong>up_limit_id:</strong> 创建当前read view
+时“活跃事务中的<strong>最小事务版本号</strong>”</p>
+<p><strong>creator_trx_id:</strong> 创建当前read view的事务版本号；</p>
+<p><strong>5.2. ReadView 匹配条件</strong></p>
+<p>在进行 SELECT 操作时，<strong>根据数据行快照的 DB_TRX_ID 与
+low_limit_id 和 up_limit_id
+之间的关系，从而判断数据行快照是否可以使用</strong>：</p>
+<ul>
+<li><p><strong>DB_TRX_ID &lt; up_limit_id：</strong>如果数据行快照的
+DB_TRX_ID <strong>小于</strong> ReadView
+中的活跃事务中的<strong>最小事务版本号</strong>，则可以肯定该数据是在当前事务启之前就已经存在了的，所以可以显示。</p></li>
+<li><p><strong>DB_TRX_ID &gt;= low_limit_id：</strong>如果数据行快照的
+DB_TRX_ID <strong>大于</strong> ReadView
+中的活跃事务中的<strong>最大事务版本号</strong>，则说明该数据是在当前
+ReadView 创建之后才产生的，所以数据不予显示。</p></li>
+<li><p><strong>up_limit_id &lt;= DB_TRX_ID &lt;
+low_limit_id：</strong>如果数据行快照的 DB_TRX_ID
+<strong>处于最大、最小事务版本号之间</strong>，这种情况就说明这个数据有可能是在当前事务开始的时候还没有提交的。</p>
+<p>所以这时候我们需要把数据行快照的 DB_TRX_ID 与当前 ReadView
+中的<strong>活跃事务集合 trx_ids</strong> 匹配：</p>
+<ul>
+<li><strong>情况1:</strong> 如果 DB_TRX_ID 不存在于 trx_ids
+集合（则说明read view产生的时候事务已经 commit
+了），这种情况数据则可以显示。</li>
+<li><strong>情况2：</strong> 如果 DB_TRX_ID 存在 trx_ids 则说明read
+view产生的时候数据还没有提交，但是如果数据的事务ID等于 creator_trx_id
+，那么说明这个数据就是当前事务自己生成的，自己生成的数据自己当然能看见，所以这种情况下此数据也是可以显示的。</li>
+<li><strong>情况3：</strong> 如果 DB_TRX_ID 既存在 trx_ids 而且又不等于
+creator_trx_id 那就说明 read view
+产生的时候数据还没有提交，又不是自己生成的，所以这种情况下此数据不能显示。</li>
+</ul></li>
+<li><p><strong>不满足 ReadView 条件时候，从 undo log
+里面获取数据</strong></p>
+<p>当数据行快照的 DB_TRX_ID 不满足 ReadView 条件时候，从 undo log
+里面获取数据的历史版本，然后数据历史版本事务号回头再来和 ReadView
+条件匹配
+，直到找到一条满足条件的历史数据，或者找不到则返回空结果；</p></li>
+</ul>
+<h3 id="innodb实现mvcc的原理">Innodb实现MVCC的原理</h3>
+<h4 id="mvcc实现流程">MVCC实现流程</h4>
+<ul>
+<li>开启事务获得事务版本号</li>
+<li>生成 ReadView（根据不同隔离级别，有不同的表现）</li>
+<li>查询到数据行的快照，通过快照的 DB_TRX_ID 与 ReadView 进行匹配
+<ul>
+<li>不符合 ReadView 匹配规则，则从 undo log 里获取快照的历史版本</li>
+<li>符合则返回快照数据</li>
+</ul></li>
+</ul>
+<h4 id="各种事务隔离级别下的-readview-工作方式">各种事务隔离级别下的
+ReadView 工作方式</h4>
+<p><strong>RC（提交读）级别</strong>下同一个事务里面的<strong>每一次查询都会获得一个新的
+read view
+副本</strong>。这样就可能造成同一个事务里前后读取数据可能不一致的问题（即<strong>不可重复读问题</strong>的出现）。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/v2-0c77f30980dc7e45f5aaac8a574e8672_1440w.jpg" alt="img" style="zoom:80%;"></p>
+<p><strong>RR（可重复读）级别</strong>下的<strong>一个事务里只会获取一次
+read view
+副本</strong>，从而保证每次查询的数据都是一样的。在可重复读隔离级别下，<strong>普通查询是快照读</strong>，是不会看到别的事务插入的数据的，幻影读只在<strong>当前读</strong>下才会出现。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/v2-82eeabba61c97def5d19aeb3cb77182c_1440w.jpg" alt="img" style="zoom:80%;"></p>
+<p><strong>RU（未提交读）级别</strong>的事务不会获取 read view
+副本。</p>
+<h3 id="快照读与当前读">快照读与当前读</h3>
+<p>在 MVCC 并发控制中, 读操作可以的分成两类 : 快照读(consistent read)
+与当前读(locking read)</p>
+<ul>
+<li><strong>快照读</strong>：读取的是记录的可见版本
+(有可能是历史版本)，不用加锁</li>
+<li><strong>当前读</strong>,：读取的是记录的最新版本,
+并且返回的记录都会加上锁, 保证其他事务不会再并发修改这条记录</li>
+</ul>
+<p><strong>快照读的情况下可以避免幻影读问题，在当前读的情况下则需要加锁来解决幻影读问题的</strong>。</p>
+<h4 id="快照读consistent-read">1. 快照读(consistent read)</h4>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html">官方文档</a></p>
+<blockquote>
+<p>前提是隔离级别不是串行级别，串行级别下的快照读会退化成当前读</p>
+</blockquote>
+<p>像<code>不加锁</code>的select操作就是快照读，即不加锁的非阻塞读；快照读的前提是隔离级别不是串行级别，串行级别下的快照读会退化成当前读；之所以出现快照读的情况，是基于提高并发性能的考虑，快照读的实现是基于多版本并发控制，即MVCC，可以认为MVCC是行锁的一个变种，但它在很多情况下，避免了加锁操作，降低了开销；既然是基于多版本，即快照读可能读到的并不一定是数据的最新版本，而有可能是之前的历史版本。</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> <span class="token keyword">table</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="当前读locking-read">2. 当前读(locking read)</h4>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html">官方文档</a></p>
+<p>当前读一定是读取的是记录的最新版本，读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁。MVCC
+其它会对数据库进行修改的操作（INSERT、UPDATE、DELETE）需要进行加锁操作，从而读取最新的数据。可以看到
+MVCC 并不是完全不用加锁，而只是避免了 SELECT 的加锁操作。</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">INSERT</span><span class="token punctuation">;</span>
+<span class="token keyword">UPDATE</span><span class="token punctuation">;</span>
+<span class="token keyword">DELETE</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>在进行 SELECT 操作时，可以强制指定进行加锁操作。以下第一个语句需要加
+S 锁，第二个需要加 X 锁。</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> <span class="token keyword">table</span> <span class="token keyword">WHERE</span> ? <span class="token keyword">lock</span> <span class="token operator">in</span> <span class="token keyword">share mode</span><span class="token punctuation">;</span>
+<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> <span class="token keyword">table</span> <span class="token keyword">WHERE</span> ? <span class="token keyword">for</span> <span class="token keyword">update</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h4 id="当前读快照读mvcc关系">3. 当前读，快照读，MVCC关系</h4>
+<p>MVCC（多版本并发控制）指的是维持一个数据的多个版本，使得读写操作没有冲突，快照读是MySQL为实现MVCC的一个非阻塞的读功能，MVCC模块在MySQL中的具体实现是由三个隐式字段、undo
+log、read view 这三个组件来实现的。</p>
+<h2 id="八关系数据库设计原理">八、关系数据库设计原理</h2>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/24696366/answer/29189700">参考文章-知乎</a></p>
+<h3 id="异常">异常</h3>
+<p>如果数据表设计不符合范式（或仅满足部分范式）要求，则可能会出现仍然会存在数据冗余过大，插入异常，删除异常，修改异常的问题。</p>
+<p>例如，如下设计（<strong>表1</strong>）：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231150306043.png" alt="image-20211231150306043" style="zoom:50%;"></p>
+<h4 id="数据冗余过大">数据冗余过大</h4>
+<p>每一名学生的学号、姓名、系名、系主任这些数据重复多次。每个系与对应的系主任的数据也重复多次。</p>
+<h4 id="插入异常">插入异常</h4>
+<p>假如学校新建了一个系，但是暂时还没有招收任何学生（比如3月份就新建了，但要等到8月份才招生），那么是无法将系名与系主任的数据单独地添加到数据表中去的
+（注１）</p>
+<p>注１：根据三种关系完整性约束中实体完整性的要求，关系中的码（注２）所包含的任意一个属性都不能为空，所有属性的组合也不能重复。为了满足此要求，图中的表，只能将学号与课名的组合作为码，否则就无法唯一地区分每一条记录。</p>
+<p>注２：<strong>码：关系中的某个属性或者某几个属性的组合，用于区分每个元组（可以把“元组”理解为一张表中的每条记录，也就是每一行）</strong>。</p>
+<h4 id="删除异常">删除异常</h4>
+<p>假如将某个系中所有学生相关的记录都删除，那么所有系与系主任的数据也就随之消失了（一个系所有学生都没有了，并不表示这个系就没有了）。</p>
+<h4 id="修改异常">修改异常</h4>
+<p>假如李小明转系到法律系，那么为了保证数据库中数据的一致性，需要修改三条记录中系与系主任的数据。</p>
+<h3 id="函数依赖">函数依赖</h3>
+<p>我们可以这么理解（但并不是特别严格的定义）：<strong>若在一张表中，在属性（或属性组）X的值确定的情况下，必定能确定属性Y的值，那么就可以说Y函数依赖于X，写作
+X → Y</strong>。</p>
+<p>也就是说，在数据表中，不存在任意两条记录，它们在X属性（或属性组）上的值相同，而在Y属性上的值不同。这也就是“函数依赖”名字的由来，类似于函数关系
+y = f(x)，在x的值确定的情况下，y的值一定是确定的。</p>
+<h4 id="完全函数依赖">完全函数依赖</h4>
+<p>在一张表中，若 X → Y，且对于 X 的任何一个真子集X'（假如属性组 X
+包含超过一个属性的话），X ' → Y 不成立，那么我们称 Y 对于 X
+<strong>完全函数依赖</strong>，记作 X F→
+Y。（那个F应该写在箭头的正上方，没办法打出来……，正确的写法如图）</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231151131418.png" alt="image-20211231151131418" style="zoom:50%;"></p>
+<p>例如：</p>
+<ul>
+<li>学号 F→ 姓名</li>
+<li>（学号，课名） F→ 分数
+（注：因为同一个的学号对应的分数不确定，同一个课名对应的分数也不确定）</li>
+</ul>
+<h4 id="部分函数依赖">部分函数依赖</h4>
+<p>假如 Y 函数依赖于 X，但同时 Y 并不完全函数依赖于 X，那么我们就称 Y
+部分函数依赖于 X，记作 X P→ Y，如<strong>图</strong>。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231151255347.png" alt="image-20211231151255347" style="zoom:50%;"></p>
+<p>例如：</p>
+<ul>
+<li>（学号，课名） P→ 姓名</li>
+</ul>
+<h4 id="传递函数依赖">传递函数依赖</h4>
+<p>假如 Z 函数依赖于 Y，且 Y 函数依赖于 X （前提：『Y 不包含于 X，且 X
+不函数依赖于 Y』），那么我们就称 Z 传递函数依赖于 X ，记作 X T→
+Z，如<strong>图</strong>。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231151501461.png" alt="image-20211231151501461" style="zoom:50%;"></p>
+<h3 id="其他概念">其他概念</h3>
+<h4 id="码">码</h4>
+<p>设 K 为某表中的一个属性或属性组，若除 K
+之外的所有属性都完全函数依赖于 K（这个“完全”不要漏了），那么我们称 K
+为<strong>候选码</strong>，简称为<strong>码</strong>。在实际中我们通常可以理解为：<strong>假如当
+K 确定的情况下，该表除 K 之外的所有属性的值也就随之确定，那么 K
+就是码。</strong>一张表中可以有超过一个码。（实际应用中为了方便，通常选择其中的一个码作为<strong>主码</strong>）</p>
+<p>例如：
+对于表1，<strong>（学号、课名）</strong>这个属性组就是码。该表中有且仅有这一个码。（假设所有课没有重名的情况）</p>
+<h4 id="非主属性">非主属性</h4>
+<p>包含在任何一个码中的属性称为主属性，其他的则为非主属性。</p>
+<p>例如： 对于表1，主属性就有两个，<strong>学号</strong> 与
+<strong>课名</strong>。</p>
+<h3 id="范式">范式</h3>
+<p>范式是“符合某一种级别的关系模式的集合，表示一个关系内部各属性之间的联系的合理化程度”。实际上可以把它粗略地理解为<strong>一张数据表的表结构所符合的某种设计标准的级别</strong>。</p>
+<p>数据库范式也分为1NF，2NF，3NF，BCNF，4NF，5NF。一般在我们设计关系型数据库的时候，最多考虑到BCNF就够。符合高一级范式的设计，必定符合低一级范式，例如符合2NF的关系模式，必定符合1NF。</p>
+<h4 id="第一范式1nf">第一范式（1NF）</h4>
+<blockquote>
+<p>仅满足 1NF 则会出现所有异常问题</p>
+</blockquote>
+<p><strong>如果一个关系模式R的所有属性都是不可分的基本数据项，则R∈1NF。</strong></p>
+<p>符合1NF的关系（你可以理解为数据表。“关系模式”和“关系”的区别，类似于面向对象程序设计中”类“与”对象“的区别。”关系“是”关系模式“的一个实例，你可以把”关系”理解为一张带数据的表，而“关系模式”是这张数据表的表结构。<strong>1NF的定义为：符合1NF的关系中的每个属性都不可再分。</strong></p>
+<p><strong>表2</strong>所示的情况，就不符合1NF的要求。</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231145319956.png" alt="image-20211231145319956" style="zoom:50%;"></p>
+<p>实际上，<strong>1NF是所有关系型数据库的最基本要求</strong>，你在关系型数据库管理系统（RDBMS），例如SQL
+Server，Oracle，MySQL中创建数据表的时候，如果数据表的设计不符合这个最基本的要求，那么操作一定是不能成功的。也就是说，只要在RDBMS中已经存在的数据表，一定是符合1NF的。如果我们要在RDBMS中表现表中的数据，就得设计为<strong>表3</strong>的形式：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231145528740.png" alt="image-20211231145528740" style="zoom:50%;"></p>
+<h4 id="第二范式2nf">第二范式（2NF）</h4>
+<p><strong>若关系模式R∈1NF，并且每一个非主属性都<a target="_blank" rel="noopener" href="http://baike.baidu.com/view/228997.htm">完全函数依赖</a>于R的码，则R∈2NF。</strong></p>
+<p>2NF在1NF的基础之上，消除了非主属性对于码的部分函数依赖。</p>
+<p><strong>判断是否满足 2NF 的方法是：</strong></p>
+<ul>
+<li>第一步：找出数据表中所有的<strong>码</strong>。</li>
+<li>第二步：根据第一步所得到的码，找出所有的<strong>主属性</strong>。</li>
+<li>第三步：数据表中，除去所有的主属性，剩下的就都是<strong>非主属性</strong>了。</li>
+<li>第四步：查看是否存在非主属性对码的<strong>部分函数依赖</strong>。</li>
+</ul>
+<p>例如，<strong>表1</strong>：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231150306043.png" alt="image-20211231150306043" style="zoom:50%;"></p>
+<p><strong>表1</strong>的所有函数依赖关系为：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231153603160.png" alt="image-20211231153603160" style="zoom: 33%;"></p>
+<p>这一步完成以后，可以得到，表1的码只有一个，就是<strong>（学号、课名）</strong>。</p>
+<p>第二步： 主属性有两个：<strong>学号</strong> 与
+<strong>课名</strong></p>
+<p>第三步：
+非主属性有四个：<strong>姓名</strong>、<strong>系名</strong>、<strong>系主任</strong>、<strong>分数</strong></p>
+<p><strong>第四步：</strong> 对于<strong>（学号，课名） →
+姓名</strong>，有 <strong>学号 → 姓名</strong>，存在非主属性
+<strong>姓名</strong>
+对码<strong>（学号，课名）</strong>的部分函数依赖。
+对于<strong>（学号，课名） → 系名</strong>，有 <strong>学号 →
+系名</strong>，存在非主属性 系<strong>名</strong>
+对码<strong>（学号，课名）</strong>的部分函数依赖。
+对于<strong>（学号，课名） → 系主任</strong>，有 <strong>学号 →
+系主任</strong>，存在非主属性
+对码<strong>（学号，课名）</strong>的部分函数依赖。</p>
+<p>所以<strong>表1</strong>存在非主属性对于码的部分函数依赖，最高只符合1NF的要求，不符合2NF的要求。</p>
+<p>为了让表1符合 2NF
+的要求，我们必须消除这些部分函数依赖，只有一个办法，就是将大数据表拆分成两个或者更多个更小的数据表，在拆分的过程中，要达到更高一级范式的要求，这个过程叫做”模式分解“。模式分解的方法不是唯一的，以下是其中一种方法：
+选课（学号，课名，分数） 学生（学号，姓名，系名，系主任）</p>
+<p>对于<strong>选课</strong>表，其码是<strong>（学号，课名）</strong>，主属性是<strong>学号</strong>和<strong>课名</strong>，非主属性是<strong>分数</strong>，<strong>学号</strong>确定，并不能唯一确定<strong>分数</strong>，<strong>课名</strong>确定，也不能唯一确定<strong>分数</strong>，所以不存在非主属性<strong>分数</strong>对于码
+<strong>（学号，课名）</strong>的部分函数依赖，所以此表符合2NF的要求。</p>
+<p>对于<strong>学生</strong>表，其码是<strong>学号，</strong>主属性是<strong>学号</strong>，非主属性是<strong>姓名、系名</strong>和<strong>系主任</strong>，因为码只有一个属性，所以不可能存在非主属性对于码
+的部分函数依赖，所以此表符合 2NF 的要求。</p>
+<p><strong>下图</strong>表示了模式分解以后的新的函数依赖关系</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231154051715.png" alt="image-20211231154051715" style="zoom: 33%;"></p>
+<p><strong>表4</strong>表示了模式分解以后新的数据</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231154116174.png" alt="image-20211231154116174" style="zoom: 50%;"></p>
+<p><strong>解决/改进的异常</strong></p>
+<ul>
+<li>数据冗余过多（改进）：学生的姓名、系名与系主任，不再像之前一样重复那么多次了。</li>
+<li>修改异常（改进）：李小明转系到法律系，只需要修改一次李小明对应的系的值即可。（但是并没有完全解决这个问题，如果要更改系主任，则需要改所有学生行对于的系信息。）</li>
+</ul>
+<p><strong>未解决的异常</strong></p>
+<ul>
+<li><p>删除异常：删除某个系中所有的学生记录，该系的信息仍然全部丢失。</p></li>
+<li><p>插入异常：插入一个尚无学生的新系的信息。因为学生表的码是学号，不能为空，所以此操作不被允许。</p></li>
+</ul>
+<h4 id="第三范式3nf">第三范式（3NF）</h4>
+<p><strong><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/关系模式">关系模式</a>R
+中若不存在这样的码X、属性组Y及非主属性Z（Z
+(强制依赖)Y），使得X→Y，Y→Z，成立，Y→X不成立，则称R ∈ 3NF。</strong></p>
+<p><strong>3NF在2NF的基础之上，消除了非主属性对于码的传递函数依赖</strong>。也就是说，
+如果存在非主属性对于码的传递函数依赖，则不符合3NF的要求。</p>
+<p>例如，<strong>表4</strong>的设计中：</p>
+<p>对于<strong>选课</strong>表，符合3NF要求。</p>
+<p>对于<strong>学生</strong>表，主码为<strong>学号</strong>，主属性为<strong>学号</strong>，非主属性为<strong>姓名</strong>、<strong>系名</strong>和<strong>系主任</strong>。因为
+学号 → 系名，同时 系名 →
+系主任，所以存在非主属性<strong>系主任</strong>对于码<strong>学号</strong>的传递函数依赖，所以<strong>学生</strong>表的设计，不符合3NF的要求。</p>
+<p>为了让数据表设计达到3NF，我们必须进一步进行模式分解为以下形式：
+选课（学号，课名，分数） 学生（学号，姓名，系名） 系（系名，系主任）</p>
+<p>这样就都满足 3NF 的要求了，新的函数依赖如图：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231154901414.png" alt="image-20211231154901414" style="zoom:33%;"></p>
+<p>新的数据表，<strong>表5</strong></p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231154944079.png" alt="image-20211231154944079" style="zoom:50%;"></p>
+<p><strong>解决/改进的异常</strong></p>
+<ul>
+<li><p>数据冗余过多（改进）：数据冗余更加少了。</p></li>
+<li><p>删除异常：删除某个系中所有的学生记录，该系的信息不会丢失。</p></li>
+<li><p>插入异常：插入一个尚无学生的新系的信息。因为系表与学生表目前是独立的两张表，所以不影响。</p></li>
+</ul>
+<h4 id="bc范式bcnf">BC范式（BCNF）</h4>
+<p><strong>对于关系模式R，若
+R为第一范式，且每个属性都不部分依赖于码也不传递依赖于码，则R称之为BC范式。</strong></p>
+<p>即在 3NF
+的基础上消除<strong>主属性</strong>对于码的部分与传递函数依赖。</p>
+<p>例如以下问题：</p>
+<ul>
+<li>某公司有若干个仓库；</li>
+<li>每个仓库只能有一名管理员，一名管理员只能在一个仓库中工作；</li>
+<li>一个仓库中可以存放多种物品，一种物品也可以存放在不同的仓库中。每种物品在每个仓库中都有对应的数量。</li>
+</ul>
+<p>数据表如下：</p>
+<p><img src="/2022/03/20/2c8f729b6f23/image-20211231161037957.png" alt="image-20211231161037957" style="zoom:50%;"></p>
+<p>看判断，不存在非主属性对码的部分函数依赖和传递函数依赖，该表为
+3NF（但是，某些情况下仍会存在异常问题）。</p>
+<p><strong>存在异常</strong></p>
+<ul>
+<li><p>插入异常：先新增加一个仓库，但尚未存放任何物品，是否可以为该仓库指派管理员？——不可以，因为物品名也是主属性，根据实体完整性的要求，主属性不能为空。</p></li>
+<li><p>删除异常：某仓库被清空后，需要删除所有与这个仓库相关的物品存放记录，会带来什么问题？——仓库本身与管理员的信息也被随之删除了。</p></li>
+<li><p>修改异常：如果某仓库更换了管理员，会带来什么问题？——这个仓库有几条物品存放记录，就要修改多少次管理员信息。</p></li>
+</ul>
+<p><strong>造成此问题的原因</strong></p>
+<p>存在着<strong>主属性</strong>对于码的部分函数依赖与传递函数依赖。（在此例中就是存在主属性【仓库名】对于码【（管理员，物品名）】的部分函数依赖。</p>
+<p><strong>解决办法</strong></p>
+<p>解决办法就是要在 3NF
+的基础上消除<strong>主属性</strong>对于码的部分与传递函数依赖。</p>
+<p><strong>模式分解为如下表：</strong></p>
+<p>仓库（仓库名，管理员） 库存（仓库名，物品名，数量）</p>
+<p>这样，之前的插入异常，修改异常与删除异常的问题就被解决了。</p>
+<h4 id="总结">总结</h4>
+<p>符合 3NF
+要求的数据库设计，<strong>基本</strong>上解决了数据冗余过大，插入异常，修改异常，删除异常的问题。当然，在实际中，往往为了性能上或者应对扩展的需要，经常做到
+2NF 或者 1NF 。</p>
+<p>但在某些特殊情况下，即使关系模式符合 3NF
+的要求，仍然存在着插入异常，修改异常与删除异常的问题，仍然不是 ”好“
+的设计。</p>
+<h4 id="范式化的优缺点时间换空间">范式化的优缺点（时间换空间）</h4>
+<p>优点：</p>
+<ul>
+<li>范式化的表减少了数据冗余，数据表更新操作快、占用存储空间少。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>查询时需要对多个表进行关联，查询性能降低。</li>
+<li>更难进行索引优化</li>
+</ul>
+<h4 id="反范式化的优缺点空间换时间">反范式化的优缺点（空间换时间）</h4>
+<p>反范式的过程就是通过冗余数据来提高查询性能，但冗余数据会牺牲数据一致性</p>
+<p>优点：</p>
+<ul>
+<li>可以减少表关联</li>
+<li>可以更好进行索引优化</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>存在大量冗余数据</li>
+<li>数据维护成本更高（一个地方修改了，所有冗余字段也要对应修改）</li>
+</ul>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2022/03/20/2c8f729b6f23/%20风吹流年远%20MySQL数据库系统原理" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2022/03/20/b4fd84628713/" title="分布式事务的处理"><i class="fa fa-angle-double-left"></i>&nbsp;上一篇: 分布式事务的处理</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2022/03/20/901829efe361/" title="MySQL学习">下一篇: MySQL学习&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

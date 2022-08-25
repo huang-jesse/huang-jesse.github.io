@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>分布式事务的处理 · 风吹流年远</title><meta name="description" content="概念
+参考文章-分布式事务的处理
+分布式事务主要需要考虑以下问题：
+1）容灾：数据不丢、结点的Failover
+2）数据的一致性：事务处理
+3）性能：吞吐量 、 响应时间
+一般来说：
+1）要想让数据有高可用性，就得写多份数据。
+2）写多份的问题会导致数据一致性的问题。
+3）数据一致性的问题又会引发性"><meta name="og:description" content="概念
+参考文章-分布式事务的处理
+分布式事务主要需要考虑以下问题：
+1）容灾：数据不丢、结点的Failover
+2）数据的一致性：事务处理
+3）性能：吞吐量 、 响应时间
+一般来说：
+1）要想让数据有高可用性，就得写多份数据。
+2）写多份的问题会导致数据一致性的问题。
+3）数据一致性的问题又会引发性"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="分布式事务的处理"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>分布式事务的处理</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-03-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/分布式/" title="分布式" class="a-tag">分布式</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/分布式事务/" title="分布式事务" class="a-tag">分布式事务</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><h1 id="概念">概念</h1>
+<p><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/10910.html">参考文章-分布式事务的处理</a></p>
+<p>分布式事务主要需要考虑以下问题：</p>
+<p>1）<strong>容灾</strong>：数据不丢、结点的Failover</p>
+<p>2）<strong>数据的一致性</strong>：事务处理</p>
+<p>3）<strong>性能：吞吐量 、 响应时间</strong></p>
+<p>一般来说：</p>
+<p><strong>1）要想让数据有高可用性，就得写多份数据。</strong></p>
+<p><strong>2）写多份的问题会导致数据一致性的问题。</strong></p>
+<p><strong>3）数据一致性的问题又会引发性能问题</strong></p>
+<h1 id="一致性模型">一致性模型</h1>
+<p>数据一致性简单说有三种类型（当然，如果细分的话，还有很多一致性模型，如：顺序一致性，FIFO一致性，会话一致性，单读一致性，单写一致性）：</p>
+<p>1）<strong>Weak
+弱一致性</strong>：当你写入一个新值后，读操作在数据副本上可能读出来，也可能读不出来。比如：某些cache系统，网络游戏其它玩家的数据和你没什么关系，VOIP这样的系统。</p>
+<p>2）<strong>Eventually
+最终一致性</strong>：当你写入一个新值后，有可能不能立刻读出来，但在某个时间窗口之后保证最终能读出来。比如：DNS，电子邮件、Amazon
+S3，Google搜索引擎这样的系统。</p>
+<p>3）<strong>Strong
+强一致性</strong>：新的数据一旦写入，在任意副本任意时刻都能读到新值。比如：文件系统，RDBMS，Azure
+Table都是强一致性的。</p>
+<p>从这三种一致性的模型上来说，我们可以看到，Weak和Eventually一般来说是异步冗余的，而Strong一般来说是同步冗余的，异步的通常意味着更好的性能，但也意味着更复杂的状态控制。同步意味着简单，但也意味着性能下降。</p>
+<h1 id="master-slave">Master-Slave</h1>
+<p><strong>首先是Master-Slave结构，对于这种架构，Slave一般是Master的备份。</strong>在这样的系统中，一般是如下设计的：</p>
+<p>1）读写请求都由Master负责。</p>
+<p>2）写请求写到Master上后，由Master同步到Slave上。</p>
+<p><strong>从Master同步到Slave上，你可以使用异步，也可以使用同步，可以使用Master来push，也可以使用Slave来pull。
+通常来说是Slave来周期性的pull，所以，是最终一致性。这个设计的问题是，如果Master在pull周期内垮掉了，那么会导致这个时间片内的数据丢失。如果你不想让数据丢掉，Slave只能成为Read-Only的方式等Master恢复。</strong></p>
+<p>当然，如果你可以容忍数据丢掉的话，你可以马上让Slave代替Master工作（对于只负责计算的结点来说，没有数据一致性和数据丢失的问题，Master-Slave的方式就可以解决单点问题了）
+当然，Master Slave也可以是强一致性的，
+比如：当我们写Master的时候，Master负责先写自己，等成功后，再写Slave，两者都成功后返回成功，整个过程是同步的，如果写Slave失败了，那么两种方法，一种是标记Slave不可用报错并继续服务（等Slave恢复后同步Master的数据，可以有多个Slave，这样少一个，还有备份，就像前面说的写三份那样），另一种是回滚自己并返回写失败。（注：一般不先写Slave，因为如果写Master自己失败后，还要回滚Slave，此时如果回滚Slave失败，就得手工订正数据了）你可以看到，如果Master-Slave需要做成强一致性有多复杂。</p>
+<h1 id="master-master">Master-Master</h1>
+<p>Master-Master，又叫<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Multi-master_replication">Multi-master</a>，是指一个系统存在两个或多个Master，每个Master都提供read-write服务。<strong>这个模型是Master-Slave的加强版，数据间同步一般是通过Master间的异步完成，所以是最终一致性。</strong>
+Master-Master的好处是，一台Master挂了，别的Master可以正常做读写服务，他和Master-Slave一样，当数据没有被复制到别的Master上时，数据会丢失。很多数据库都支持Master-Master的Replication的机制。</p>
+<p>另外，如果多个Master对同一个数据进行修改的时候，这个模型的恶梦就出现了——对数据间的冲突合并，这并不是一件容易的事情。就像我们的SVN源码冲突一样，对于同一行代码的冲突，只能交给开发者自己来处理。</p>
+<h1 id="twothree-phase-commit">Two/Three Phase Commit</h1>
+<p>这个协议的缩写又叫2PC，中文叫两阶段提交。在分布式系统中，每个节点虽然可以知晓自己的操作时成功或者失败，却无法知道其他节点的操作的成功或失败。当一个事务跨越多个节点时，为了保持事务的ACID特性，需要引入一个作为<strong>协调者</strong>的组件来统一掌控所有节点(称作<strong>参与者</strong>)的操作结果并最终指示这些节点是否要把操作结果进行真正的提交(比如将更新后的数据写入磁盘等等)。
+两阶段提交的算法如下：</p>
+<p><strong>第一阶段</strong>：</p>
+<ol type="1">
+<li>协调者会问所有的参与者结点，是否可以执行提交操作。</li>
+<li>各个参与者开始事务执行的准备工作：如：为资源上锁，预留资源，写undo/redo
+log……</li>
+<li>参与者响应协调者，如果事务的准备工作成功，则回应“可以提交”，否则回应“拒绝提交”。</li>
+</ol>
+<p><strong>第二阶段</strong>：</p>
+<ul>
+<li><p>如果所有的参与者都回应“可以提交”，那么，协调者向所有的参与者发送“正式提交”的命令。参与者完成正式提交，并释放所有资源，然后回应“完成”，协调者收集各结点的“完成”回应后结束这个Global
+Transaction。</p></li>
+<li><p>如果有一个参与者回应“拒绝提交”，那么，协调者向所有的参与者发送“回滚操作”，并释放所有资源，然后回应“回滚完成”，协调者收集各结点的“回滚”回应后，取消这个Global
+Transaction。</p></li>
+</ul>
+<p><img src="/2022/03/20/b4fd84628713/Two-phase_commit.png" alt="img" style="zoom:80%;"></p>
+<p>我们可以看到，2PC说白了就是第一阶段做Vote，第二阶段做决定的一个算法，也可以看到2PC这个事是强一致性的算法。在前面我们讨论过Master-Slave的强一致性策略，和2PC有点相似，只不过2PC更为保守一些——先尝试再提交。
+2PC用的是比较多的，在一些系统设计中，会串联一系列的调用，比如：A -&gt; B
+-&gt; C -&gt;
+D，每一步都会分配一些资源或改写一些数据。比如我们B2C网上购物的下单操作在后台会有一系列的流程需要做。如果我们一步一步地做，就会出现这样的问题，如果某一步做不下去了，那么前面每一次所分配的资源需要做反向操作把他们都回收掉，所以，操作起来比较复杂。现在很多处理流程（Workflow）都会借鉴2PC这个算法，使用
+try -&gt; confirm的流程来确保整个流程的能够成功完成。</p>
+<p><strong>另外，我们也可以看到其中的一些问题，
+A）其中一个是同步阻塞操作，这个事情必然会非常大地影响性能。
+B）另一个主要的问题是在TimeOut上</strong>，比如，</p>
+<p>1）如果第一阶段中，参与者没有收到询问请求，或是参与者的回应没有到达协调者。那么，需要协调者做超时处理，一旦超时，可以当作失败，也可以重试。</p>
+<p>2）如果第二阶段中，正式提交发出后，如果有的参与者没有收到，或是参与者提交/回滚后的确认信息没有返回，一旦参与者的回应超时，要么重试，要么把那个参与者标记为问题结点剔除整个集群，这样可以保证服务结点都是数据一致性的。</p>
+<p>3）糟糕的情况是，第二阶段中，如果参与者收不到协调者的commit/fallback指令，参与者将处于“状态未知”阶段，参与者完全不知道要怎么办，比如：如果所有的参与者完成第一阶段的回复后（可能全部yes，可能全部no，可能部分yes部分no），如果协调者在这个时候挂掉了。那么所有的结点完全不知道怎么办（问别的参与者都不行）。为了一致性，要么死等协调者，要么重发第一阶段的yes/no命令。</p>
+<p>两段提交最大的问题就是第3）项，<strong>如果第一阶段完成后，参与者在第二阶没有收到决策，那么数据结点会进入“不知所措”的状态，这个状态会block住整个事务</strong>。也就是说，协调者Coordinator对于事务的完成非常重要，Coordinator的可用性是个关键。</p>
+<p>因些，我们引入三段提交，三段提交在<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Three-phase_commit_protocol">Wikipedia</a>上的描述如下，他把二段提交的第一个段break成了两段：询问，然后再锁资源。最后真正提交。三段提交的示意图如下：</p>
+<p><img src="/2022/03/20/b4fd84628713/Three-phase_commit_diagram.png" alt="img"></p>
+<p>三段提交的核心理念是：<strong>在询问的时候并不锁定资源，除非所有人都同意了，才开始锁资源</strong>。</p>
+<p>理论上来说，如果第一阶段所有的结点返回成功，那么有理由相信成功提交的概率很大。这样一来，可以降低参与者Cohorts的状态未知的概率。也就是说，一旦参与者收到了PreCommit，意味他知道大家其实都同意修改了。这一点很重要。下面我们来看一下3PC的状态迁移图：（<strong>注意图中的虚线，那些F,T是Failuer或Timeout</strong>，其中的：状态含义是
+q – Query，a – Abort，w – Wait，p – PreCommit，c – Commit）</p>
+<p><img src="/2022/03/20/b4fd84628713/Three-phase_commit_status.png" alt="img" style="zoom:80%;"></p>
+<p>从上图的状态变化图我们可以从虚线（那些F,T是Failuer或Timeout）看到——<strong>如果结点处在P状态（PreCommit）的时候发生了F/T的问题，三段提交比两段提交的好处是，三段提交可以继续直接把状态变成C状态（Commit），而两段提交则不知所措</strong>。</p>
+<p>其实，三段提交是一个很复杂的事情，实现起来相当难，而且也有一些问题。</p>
+<p>看到这里，我相信你有很多很多的问题，你一定在思考2PC/3PC中各种各样的失败场景，<strong>你会发现Timeout是个非常难处理的事情，因为网络上的Timeout在很多时候让你无所事从，你也不知道对方是做了还是没有做。于是你好好的一个状态机就因为Timeout成了个摆设</strong>。</p>
+<p><strong>一个网络服务会有三种状态：1）Success，2）Failure，3）Timeout，第三个绝对是恶梦，尤其在你需要维护状态的时候</strong>。</p>
+<h1 id="paxos算法">Paxos算法</h1>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Paxos_(computer_science)">Wikipedia上的各种Paxos算法</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/31780743">Paxos算法详解</a></p>
+<p><strong>Paxos算法的目的</strong>：<strong>是在分布式环境下确定一个值，这个值被所有节点承认，并且当一个值确定后是永远不能被修改的。</strong>注意，这个值并不是狭义上的某个数，它可以是一条日志，也可以是一条命令(command)等等，根据应用场景不同，有不同的含义。</p>
+<p>基于消息传递通信模型的分布式系统，不可避免的会发生以下错误：进程可能会慢、被杀死或者重启，消息可能会延迟、丢失、重复，Paxos
+算法解决的问题是在一个可能发生上述异常的分布式系统中如何就某个值达成一致，保证不论发生以上任何异常，都不会破坏决议的一致性。一个典型的场景是，在一个分布式数据库系统中，如果各节点的初始状态一致，每个节点都执行相同的操作序列，那么他们最后能得到一个一致的状态。为保证每个节点执行相同的命令序列，需要在每一条指令上执行一个「一致性算法」以保证每个节点看到的指令一致。一个通用的一致性算法可以应用在许多场景中，是分布式计算中的重要问题。从20世纪80年代起对于一致性算法的研究就没有停止过。</p>
+<p>简单说来，Paxos的目的是让整个集群的结点对某个值的变更达成一致。Paxos算法基本上来说是个民主选举的算法——大多数的决定会成个整个集群的统一决定。任何一个点都可以提出要修改某个数据的提案，是否通过这个提案取决于这个集群中是否有超过半数的结点同意（所以Paxos算法需要集群中的结点是单数）。</p>
+<p>这个算法有两个阶段（假设这个有三个结点：A，B，C）：</p>
+<p><strong>第一阶段：Prepare阶段</strong></p>
+<p>A把申请修改的请求Prepare
+Request发给所有的结点A，B，C。注意，Paxos算法会有一个Sequence
+Number（你可以认为是一个提案号，这个数不断递增，而且是唯一的，也就是说A和B不可能有相同的提案号），这个提案号会和修改请求一同发出，任何结点在“Prepare阶段”时都会拒绝其值小于当前提案号的请求。所以，结点A在向所有结点申请修改请求的时候，需要带一个提案号，越新的提案，这个提案号就越是是最大的。</p>
+<p>如果接收结点收到的提案号n大于其它结点发过来的提案号，这个结点会回应Yes（本结点上最新的被批准提案号），并保证不接收其它&lt;n的提案。这样一来，结点上在Prepare阶段里总是会对最新的提案做承诺。</p>
+<p>优化：在上述 prepare
+过程中，如果任何一个结点发现存在一个更高编号的提案，则需要通知提案人，提醒其中断这次提案。</p>
+<p><strong>第二阶段：Accept阶段</strong></p>
+<p>如果提案者A收到了超过半数的结点返回的Yes，然后他就会向所有的结点发布Accept
+Request（同样，需要带上提案号n），如果没有超过半数的话，那就返回失败。</p>
+<p>当结点们收到了Accept
+Request后，如果对于接收的结点来说，n是最大的了，那么，它就会修改这个值，如果发现自己有一个更大的提案号，那么，结点就会拒绝修改。</p>
+<p>我们可以看以，这似乎就是一个“两段提交”的优化。其实，<strong>2PC/3PC都是分布式一致性算法的残次版本，Google
+Chubby的作者Mike
+Burrows说过这个世界上只有一种一致性算法，那就是Paxos，其它的算法都是残次品。</strong></p>
+<p>我们还可以看到：对于同一个值的在不同结点的修改提案就算是在接收方被乱序收到也是没有问题的。</p>
+<p>关于一些实例，你可以看一下Wikipedia中文中的“<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh/Paxos算法#.E5.AE.9E.E4.BE.8B">Paxos样例</a>”一节。</p>
+<h1 id="总结">总结</h1>
+<p>下图来自：Google App Engine的co-founder Ryan Barrett在2009年的google
+i/o上的演讲《<a target="_blank" rel="noopener" href="http://snarfed.org/transactions_across_datacenters_io.html">Transaction
+Across DataCenter</a>》（视频： <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=srOgpXECblk">http://www.youtube.com/watch?v=srOgpXECblk</a>）</p>
+<p><img src="/2022/03/20/b4fd84628713/Transaction-Across-DataCenter.jpg" alt="img" style="zoom:80%;"></p>
+<p>前面，我们说过，要想让数据有高可用性，就需要冗余数据写多份。写多份的问题会带来一致性的问题，而一致性的问题又会带来性能问题。从上图我们可以看到，我们基本上来说不可以让所有的项都绿起来，这就是著名的CAP理论：一致性，可用性，分区容忍性，你只可能要其中的两个。</p>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2022/03/20/b4fd84628713/%20风吹流年远%20分布式事务的处理" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2022/07/04/2d41b1698a18/" title="跳表"><i class="fa fa-angle-double-left"></i>&nbsp;上一篇: 跳表</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2022/03/20/2c8f729b6f23/" title="MySQL数据库系统原理">下一篇: MySQL数据库系统原理&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

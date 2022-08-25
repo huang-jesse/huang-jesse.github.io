@@ -6,7 +6,7 @@
   <link href="https://luoochen.github.io/atom.xml" rel="self"/>
   
   <link href="https://luoochen.github.io/"/>
-  <updated>2022-08-25T08:32:55.867Z</updated>
+  <updated>2022-08-25T12:08:00.929Z</updated>
   <id>https://luoochen.github.io/</id>
   
   <author>
@@ -17,11 +17,53 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Cookie和Session</title>
+    <link href="https://luoochen.github.io/2022/08/10/4a3467b0155c/"/>
+    <id>https://luoochen.github.io/2022/08/10/4a3467b0155c/</id>
+    <published>2022-08-10T12:00:00.000Z</published>
+    <updated>2022-08-25T12:08:00.929Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="网络协议" scheme="https://luoochen.github.io/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/"/>
+    
+    
+    <category term="Cookie" scheme="https://luoochen.github.io/tags/Cookie/"/>
+    
+    <category term="Session" scheme="https://luoochen.github.io/tags/Session/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTTP协议</title>
+    <link href="https://luoochen.github.io/2022/08/10/b5e732d99697/"/>
+    <id>https://luoochen.github.io/2022/08/10/b5e732d99697/</id>
+    <published>2022-08-10T12:00:00.000Z</published>
+    <updated>2022-08-25T12:08:30.353Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="网络协议" scheme="https://luoochen.github.io/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/"/>
+    
+    
+    <category term="HTTP" scheme="https://luoochen.github.io/tags/HTTP/"/>
+    
+    <category term="HTTPS" scheme="https://luoochen.github.io/tags/HTTPS/"/>
+    
+  </entry>
+  
+  <entry>
     <title>并查集</title>
-    <link href="https://luoochen.github.io/2022/07/04/3b1471531eae/"/>
-    <id>https://luoochen.github.io/2022/07/04/3b1471531eae/</id>
+    <link href="https://luoochen.github.io/2022/07/04/ae24cbcb94bd/"/>
+    <id>https://luoochen.github.io/2022/07/04/ae24cbcb94bd/</id>
     <published>2022-07-04T11:17:00.000Z</published>
-    <updated>2022-08-25T08:32:55.867Z</updated>
+    <updated>2022-08-25T10:43:17.574Z</updated>
     
     
     <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
@@ -37,8 +79,8 @@
   
   <entry>
     <title>线段树</title>
-    <link href="https://luoochen.github.io/2022/07/04/bf07598eb9c9/"/>
-    <id>https://luoochen.github.io/2022/07/04/bf07598eb9c9/</id>
+    <link href="https://luoochen.github.io/2022/07/04/4fdbe3386aba/"/>
+    <id>https://luoochen.github.io/2022/07/04/4fdbe3386aba/</id>
     <published>2022-07-04T11:17:00.000Z</published>
     <updated>2022-08-25T10:06:35.292Z</updated>
     
@@ -56,8 +98,8 @@
   
   <entry>
     <title>跳表</title>
-    <link href="https://luoochen.github.io/2022/07/04/cf992e4068fd/"/>
-    <id>https://luoochen.github.io/2022/07/04/cf992e4068fd/</id>
+    <link href="https://luoochen.github.io/2022/07/04/2d41b1698a18/"/>
+    <id>https://luoochen.github.io/2022/07/04/2d41b1698a18/</id>
     <published>2022-07-04T11:00:00.000Z</published>
     <updated>2022-08-25T08:32:59.580Z</updated>
     
@@ -74,11 +116,68 @@
   </entry>
   
   <entry>
+    <title>分布式事务的处理</title>
+    <link href="https://luoochen.github.io/2022/03/20/b4fd84628713/"/>
+    <id>https://luoochen.github.io/2022/03/20/b4fd84628713/</id>
+    <published>2022-03-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:06:18.213Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="分布式" scheme="https://luoochen.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
+    
+    <category term="分布式事务" scheme="https://luoochen.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL数据库系统原理</title>
+    <link href="https://luoochen.github.io/2022/03/20/2c8f729b6f23/"/>
+    <id>https://luoochen.github.io/2022/03/20/2c8f729b6f23/</id>
+    <published>2022-03-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:02:41.241Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="DB" scheme="https://luoochen.github.io/categories/DB/"/>
+    
+    
+    <category term="数据库系统原理" scheme="https://luoochen.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL学习</title>
+    <link href="https://luoochen.github.io/2022/03/20/901829efe361/"/>
+    <id>https://luoochen.github.io/2022/03/20/901829efe361/</id>
+    <published>2022-03-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:03:02.425Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="DB" scheme="https://luoochen.github.io/categories/DB/"/>
+    
+    
+    <category term="MySQL" scheme="https://luoochen.github.io/tags/MySQL/"/>
+    
+  </entry>
+  
+  <entry>
     <title>位运算</title>
-    <link href="https://luoochen.github.io/2021/07/04/4db3a9983678/"/>
-    <id>https://luoochen.github.io/2021/07/04/4db3a9983678/</id>
+    <link href="https://luoochen.github.io/2021/07/04/188332140ec1/"/>
+    <id>https://luoochen.github.io/2021/07/04/188332140ec1/</id>
     <published>2021-07-04T11:17:00.000Z</published>
-    <updated>2022-08-25T08:49:43.279Z</updated>
+    <updated>2022-08-25T11:22:10.769Z</updated>
     
     
     <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
@@ -94,20 +193,220 @@
   
   <entry>
     <title>书单</title>
-    <link href="https://luoochen.github.io/2021/06/26/2d0baa0a50bf/"/>
-    <id>https://luoochen.github.io/2021/06/26/2d0baa0a50bf/</id>
+    <link href="https://luoochen.github.io/2021/06/26/b4471c9cb960/"/>
+    <id>https://luoochen.github.io/2021/06/26/b4471c9cb960/</id>
     <published>2021-06-26T07:45:48.000Z</published>
-    <updated>2022-08-23T11:42:13.752Z</updated>
+    <updated>2022-08-25T11:50:47.843Z</updated>
     
     
     <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
     
     
     
-    <category term="Books" scheme="https://luoochen.github.io/categories/Books/"/>
+    <category term="书籍" scheme="https://luoochen.github.io/categories/%E4%B9%A6%E7%B1%8D/"/>
     
     
-    <category term="Read" scheme="https://luoochen.github.io/tags/Read/"/>
+    <category term="阅读" scheme="https://luoochen.github.io/tags/%E9%98%85%E8%AF%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>排序算法</title>
+    <link href="https://luoochen.github.io/2021/06/20/4509e3d26507/"/>
+    <id>https://luoochen.github.io/2021/06/20/4509e3d26507/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T11:51:46.543Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="算法" scheme="https://luoochen.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+    <category term="排序" scheme="https://luoochen.github.io/tags/%E6%8E%92%E5%BA%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>算法模板</title>
+    <link href="https://luoochen.github.io/2021/06/20/14a26e9c2eb8/"/>
+    <id>https://luoochen.github.io/2021/06/20/14a26e9c2eb8/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T11:52:18.443Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="算法" scheme="https://luoochen.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+    <category term="模板" scheme="https://luoochen.github.io/tags/%E6%A8%A1%E6%9D%BF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>算法问题分类合集</title>
+    <link href="https://luoochen.github.io/2021/06/20/b44c81e90bf7/"/>
+    <id>https://luoochen.github.io/2021/06/20/b44c81e90bf7/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T11:53:00.966Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="算法" scheme="https://luoochen.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+    <category term="问题分类" scheme="https://luoochen.github.io/tags/%E9%97%AE%E9%A2%98%E5%88%86%E7%B1%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring MVC 起步</title>
+    <link href="https://luoochen.github.io/2021/06/20/3a492374dddf/"/>
+    <id>https://luoochen.github.io/2021/06/20/3a492374dddf/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:19:23.080Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    <category term="Spring" scheme="https://luoochen.github.io/categories/CS/Spring/"/>
+    
+    
+    <category term="Spring MVC" scheme="https://luoochen.github.io/tags/Spring-MVC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Security</title>
+    <link href="https://luoochen.github.io/2021/06/20/e6e12673efa8/"/>
+    <id>https://luoochen.github.io/2021/06/20/e6e12673efa8/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:19:50.075Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    <category term="Spring" scheme="https://luoochen.github.io/categories/CS/Spring/"/>
+    
+    
+    <category term="Spring Security" scheme="https://luoochen.github.io/tags/Spring-Security/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring的循环依赖问题</title>
+    <link href="https://luoochen.github.io/2021/06/20/94f5629b61c4/"/>
+    <id>https://luoochen.github.io/2021/06/20/94f5629b61c4/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:20:11.861Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    <category term="Spring" scheme="https://luoochen.github.io/categories/CS/Spring/"/>
+    
+    
+    <category term="循环依赖" scheme="https://luoochen.github.io/tags/%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring 中 Bean 的生命周期</title>
+    <link href="https://luoochen.github.io/2021/06/20/1f2d34c02328/"/>
+    <id>https://luoochen.github.io/2021/06/20/1f2d34c02328/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:20:37.060Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    <category term="Spring" scheme="https://luoochen.github.io/categories/CS/Spring/"/>
+    
+    
+    <category term="生命周期" scheme="https://luoochen.github.io/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SpringCore笔记</title>
+    <link href="https://luoochen.github.io/2021/06/20/855bde794939/"/>
+    <id>https://luoochen.github.io/2021/06/20/855bde794939/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:18:56.012Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="CS" scheme="https://luoochen.github.io/categories/CS/"/>
+    
+    <category term="Spring" scheme="https://luoochen.github.io/categories/CS/Spring/"/>
+    
+    
+    <category term="Spring Core" scheme="https://luoochen.github.io/tags/Spring-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>微服务基础</title>
+    <link href="https://luoochen.github.io/2021/06/20/78d1148cb4a2/"/>
+    <id>https://luoochen.github.io/2021/06/20/78d1148cb4a2/</id>
+    <published>2021-06-20T12:00:00.000Z</published>
+    <updated>2022-08-25T12:01:53.599Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="微服务" scheme="https://luoochen.github.io/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    
+    <category term="微服务" scheme="https://luoochen.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>缓存基础</title>
+    <link href="https://luoochen.github.io/2021/03/04/c10e003a96df/"/>
+    <id>https://luoochen.github.io/2021/03/04/c10e003a96df/</id>
+    <published>2021-03-04T12:00:00.000Z</published>
+    <updated>2022-08-25T12:04:52.600Z</updated>
+    
+    
+    <summary type="html">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</summary>
+    
+    
+    
+    <category term="缓存" scheme="https://luoochen.github.io/categories/%E7%BC%93%E5%AD%98/"/>
+    
+    
+    <category term="缓存" scheme="https://luoochen.github.io/tags/%E7%BC%93%E5%AD%98/"/>
     
   </entry>
   

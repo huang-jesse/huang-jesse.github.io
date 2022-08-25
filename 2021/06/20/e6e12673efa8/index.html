@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>Spring Security · 风吹流年远</title><meta name="description" content="Spring Security
+参考文章-spring-docs
+参考文章-知乎
+Spring Security 是为基于 Spring
+的应用程序提供声明式安全保护的安全性框架。Spring Security
+提供了完整的安全性解决方案，它能够在 Web
+请求级别和方法调用级别处理身份认证和授权。"><meta name="og:description" content="Spring Security
+参考文章-spring-docs
+参考文章-知乎
+Spring Security 是为基于 Spring
+的应用程序提供声明式安全保护的安全性框架。Spring Security
+提供了完整的安全性解决方案，它能够在 Web
+请求级别和方法调用级别处理身份认证和授权。"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="Spring Security"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Time went by</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">风吹流年远</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/categories">分类</a></li><li><a href="/tags">标签</a></li><li class="soc"><a href="https://github.com/luoochen" target="_blank" rel="noopener noreferrer" aria-label="Github"><i class="fa fa-github">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>Spring Security</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-06-20</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span><a href="/categories/CS/Spring/" title="Spring" class="a-tag">Spring</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Spring-Security/" title="Spring Security" class="a-tag">Spring Security</a><span>&nbsp;</span></span></p><p class="post-abstract"><html><head></head><body><h1 id="spring-security">Spring Security</h1>
+<p><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-security/site/docs/5.2.13.RELEASE/reference/html5/#preface">参考文章-spring-docs</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/47224331">参考文章-知乎</a></p>
+<p>Spring Security 是为基于 Spring
+的应用程序提供声明式安全保护的安全性框架。Spring Security
+提供了完整的安全性解决方案，它能够在 Web
+请求级别和方法调用级别处理身份认证和授权。</p>
+<p>Spring 从两个角度来解决安全性问题。它使用 Servlet 规范中的 Filter
+保护 Web 请求并限制 URL 级别的访问。Spring Security 还能够使用 Spring
+AOP
+保护方法调用——借助于对象代理和使用通知，能够确保只有具有适当权限的用户才能访问安全保护的方法。</p>
+<h3 id="过滤-web-请求">过滤 web 请求</h3>
+<p><code>DelegetingFilterProxy</code> 是一个特殊的 Servlet
+Filter，它本身所做的工作并不多。只是将工作委托给一个
+<code>javax.servlet.Filter</code> 实现类，这个实现类作为一个
+<code>&lt;bean&gt;</code> 注册在 Spring 应用的上下文中。</p>
+<p><img src="/2021/06/20/e6e12673efa8/image-20211210154800796.png" alt="image-20211210154800796" style="zoom: 50%;"></p>
+<p><strong>通过 Java 的方式配置
+<code>DelegetingFilterProxy</code>（也可以用 <code>web.xml</code>
+的方式配置）</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">package</span> spittr<span class="token punctuation">.</span>config<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>web<span class="token punctuation">.</span>context<span class="token punctuation">.</span>AbstractSecurityWebApplicationInitializer<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SecurityWebInitializer</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractSecurityWebApplicationInitializer</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>AbstractSecurityWebApplicationInitializer</code> 实现了
+<code>WebApplicationInitializer</code> ，因此 Spring 会发现它，并用它在
+Web 容器中注册 <code>DelegetingFilterProxy</code>。</p>
+<p>不管是通过 <code>web.xml</code> 还是通过
+<code>AbstractSecurityWebApplicationInitializer</code> 的子类来配置
+<code>DelegetingFilterProxy</code>
+，它会拦截发往应用中的请求，并将请求委托给 ID 为
+<code>springSecurityFilterChain</code> bean。</p>
+<p><code>springSecurityFilterChain</code> 是另一个特殊的
+Filter，它也被称为 <code>FilterChainProxy</code>
+。它可以链接任意一个或多个其他的 Filter。Spring Security 依赖一系列
+Servlet Filter 来提供不同的安全特性。</p>
+<h3 id="安全性配置">安全性配置</h3>
+<p><strong>配置 SecurityConfig</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">package</span> spittr<span class="token punctuation">.</span>config<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>Configuration<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>config<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>web<span class="token punctuation">.</span>configuration<span class="token punctuation">.</span>EnableWebSecurity<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>config<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>web<span class="token punctuation">.</span>configuration<span class="token punctuation">.</span>WebSecurityConfigurerAdapter<span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Configuration</span>
+<span class="token annotation punctuation">@EnableWebSecurity</span> <span class="token comment" spellcheck="true">// 启用web安全功能</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SecurityConfig</span> <span class="token keyword">extends</span> <span class="token class-name">WebSecurityConfigurerAdapter</span> <span class="token punctuation">{</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在 Spring 应用上下文中，任何实现了 <code>WebSecurityConfigurer</code>
+（继承也一样）的 bean 都可以用来配置 Spring Security。</p>
+<p>通过重载 <code>WebSecurityConfigurerAdapter</code> 中的 configure()
+方法来配置 Web安全性。</p>
+<p><strong><code>WebSecurityConfigurerAdapter</code> 中的 configure()
+方法</strong></p>
+<table>
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">configure(WebSecurity)</td>
+<td style="text-align: center;">通过重载，配置 Spring Security 的 Filter
+链</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">configure(HttpSecurity)</td>
+<td style="text-align: center;">通过重载，配置如何通过拦截器保护请求</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">configure(AuthenticationManagerBuilder)</td>
+<td style="text-align: center;">通过重载，配置 user-detail 服务</td>
+</tr>
+</tbody>
+</table>
+<h3 id="配置用户存储">配置用户存储</h3>
+<blockquote>
+<p>configure(AuthenticationManagerBuilder)</p>
+</blockquote>
+<p><strong>配置 Spring Security
+基于内存的用户存储</strong>（也可以配置为关系数据库/LDAP等）</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token comment" spellcheck="true">// spittr.config.SecurityConfig</span>
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">configure</span><span class="token punctuation">(</span>AuthenticationManagerBuilder auth<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+    auth<span class="token punctuation">.</span><span class="token function">inMemoryAuthentication</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">withUser</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token string">"password"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">roles</span><span class="token punctuation">(</span><span class="token string">"USER"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">and</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">withUser</span><span class="token punctuation">(</span><span class="token string">"admin"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token string">"password"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">roles</span><span class="token punctuation">(</span><span class="token string">"USER"</span><span class="token punctuation">,</span> <span class="token string">"ADMIN"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="拦截请求">拦截请求</h3>
+<blockquote>
+<p>configure(HttpSecurity)</p>
+</blockquote>
+<p><strong>对每个请求进行细粒度安全性控制（重载 configure(HttpSecurity)
+方法）</strong></p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token comment" spellcheck="true">// spittr.config.SecurityConfig</span>
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">configure</span><span class="token punctuation">(</span>HttpSecurity http<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+    http<span class="token punctuation">.</span><span class="token function">authorizeRequests</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">antMatchers</span><span class="token punctuation">(</span><span class="token string">"/spitters/me"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">authenticated</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">antMatchers</span><span class="token punctuation">(</span>HttpMethod<span class="token punctuation">.</span>POST<span class="token punctuation">,</span> <span class="token string">"/spittles"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">authenticated</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">anyRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">permitAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</body></html></p></div><div class="share"><span>分享到</span>&nbsp;<span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://luoochen.github.io/2021/06/20/e6e12673efa8/%20风吹流年远%20Spring Security" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2021/06/20/3a492374dddf/" title="Spring MVC 起步"><i class="fa fa-angle-double-left"></i>&nbsp;上一篇: Spring MVC 起步</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2021/06/20/94f5629b61c4/" title="Spring的循环依赖问题">下一篇: Spring的循环依赖问题&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
