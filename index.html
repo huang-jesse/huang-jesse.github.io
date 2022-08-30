@@ -119,7 +119,19 @@ mjx-container[display="true"] + br {
 
 即输入数据的构建的树的深度（假设深度为
 h ）将会影响 
-的最...</p></div><div class="post-container"><p class="post-title"><a href="/2022/08/10/4a3467b0155c/">Cookie和Session</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-08-10</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/网络协议/" title="网络协议" class="a-tag">网络协议</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Cookie/" title="Cookie" class="a-tag">Cookie</a><span>&nbsp;</span><a href="/tags/Session/" title="Session" class="a-tag">Session</a><span>&nbsp;</span></span></p><p class="post-abstract">Cookie和Session
+的最...</p></div><div class="post-container"><p class="post-title"><a href="/2022/08/29/6fc0ef2f3f10/">带符号整数溢出问题</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-08-29</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/整数溢出/" title="整数溢出" class="a-tag">整数溢出</a><span>&nbsp;</span></span></p><p class="post-abstract">概述
+
+以下均演示 8位带符号整数
+
+8位带符号整数 （例如 Java 中的
+byte 数据类型），能够表示的整数范围为
+
+。按正负来分段，大致可以分为两段，即   。
+也就是说，最小不能小于 
+而最大不能大于 
+否则就会出现整数溢出的问题。比如  或者 
+这样的现象。也就是说，计算结果与我们期待的不符。
+带符号...</p></div><div class="post-container"><p class="post-title"><a href="/2022/08/10/4a3467b0155c/">Cookie和Session</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2022-08-10</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/网络协议/" title="网络协议" class="a-tag">网络协议</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/Cookie/" title="Cookie" class="a-tag">Cookie</a><span>&nbsp;</span><a href="/tags/Session/" title="Session" class="a-tag">Session</a><span>&nbsp;</span></span></p><p class="post-abstract">Cookie和Session
 认识Cookie和Session
 Cookie 和
 Session 的详解与区别-原文
@@ -195,11 +207,4 @@ InnoDB
 默认的事务型存储引擎，只有在需要它不支持的特性时，才考虑使用其它存储引擎。
 实现了四个标准的隔离级别，默认级别是可重复读（REPEATABLE
 READ）。在可重复读隔离级别下，通过多版本并发控制（MVCC）+ Next-Key
-Locki...</p></div><div class="post-container"><p class="post-title"><a href="/2021/07/04/188332140ec1/">位运算</a></p><p class="post-meta"><span class="date meta-item">发布于&nbsp;2021-07-04</span><span class="meta-item"><i class="fa fa-folder"></i><span>&nbsp;</span><a href="/categories/CS/" title="CS" class="a-tag">CS</a><span>&nbsp;</span></span><span class="meta-item"><i class="fa fa-tag"></i><span>&nbsp;</span><a href="/tags/位运算/" title="位运算" class="a-tag">位运算</a><span>&nbsp;</span></span></p><p class="post-abstract">概念
-位运算是把数字用二进制表示之后，对每一位上0或者1的运算。二进制及其位运算是现代计算机学科的基石，很多底层的技术都离不开位运算，因此位运算相关的题目也经常出现在面试中。
-原码、反码、补码
-
-以下均演示 8-bit 进行二进制展示
-
-机器数
-一个数在计算机中的二进制表示形式叫做这个数的机器数，机器数是带符号的...</p></div><div class="pagination no-margin-bottom"><p class="clearfix"><p> 第 1 页 / 共 3 页 &nbsp;</p><p><span class="pre pagbuttons"><i class="fa fa-angle-double-left"></i>&nbsp;<a role="navigation" href="/" aria-label="上一页">上一页</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/page/2/" aria-label="下一页">下一页</a>&nbsp;<i class="fa fa-angle-double-right"></i></span></p></p></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
+Locki...</p></div><div class="pagination no-margin-bottom"><p class="clearfix"><p> 第 1 页 / 共 3 页 &nbsp;</p><p><span class="pre pagbuttons"><i class="fa fa-angle-double-left"></i>&nbsp;<a role="navigation" href="/" aria-label="上一页">上一页</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/page/2/" aria-label="下一页">下一页</a>&nbsp;<i class="fa fa-angle-double-right"></i></span></p></p></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2022&nbsp;<a target="_blank" href="https://luoochen.github.io" rel="noopener noreferrer">Luoo</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
