@@ -241,7 +241,7 @@ B，但可能会多了C, D, E等新记录，这就叫<strong>幻影读</strong>�
 <li><p>通过检查 <code>innodb_row_lock</code>
 状态变量来分析系统上的表锁的争用情况：</p></li>
 </ul>
-<pre class="line-numbers language-shell"><code class="language-shell">mysql&gt; show status like 'table_locks%'; <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell"><code class="language-shell">mysql> show status like 'table_locks%'; <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <h4 id="行级锁row-level-locking">行级锁（row-level locking）</h4>
 <p>开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度也最高。</p>
 <blockquote>
@@ -255,7 +255,7 @@ InnoDB 中发生死锁是可能的。</p>
 <li>通过检查 <code>innodb_row_lock</code>
 状态变量来分析系统上的行锁的争用情况：</li>
 </ul>
-<pre class="line-numbers language-shell"><code class="language-shell">mysql&gt; show status like 'innodb_row_lock%'; <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell"><code class="language-shell">mysql> show status like 'innodb_row_lock%'; <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <h4 id="innodb-行级锁策略">InnoDB 行级锁策略</h4>
 <ul>
 <li>记录锁/行锁（Record Locks）：记录锁锁定索引中一条记录。</li>
