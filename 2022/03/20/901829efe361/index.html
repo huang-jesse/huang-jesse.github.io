@@ -12,7 +12,7 @@ InnoDB
 是 MySQL
 默认的事务型存储引擎，只有在需要它不支持的特性时，才考虑使用其它存储引擎。
 实现了四个标准的隔离级别，默认级别是可重复读（REPEATABLE
-READ）。在可重复读隔离级别下，通过多版本并发控制（MVCC）+ Next-Ke"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="MySQL学习"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/googletagmanager.js"></script><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+READ）。在可重复读隔离级别下，通过多版本并发控制（MVCC）+ Next-Ke"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="MySQL学习"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta content="Pv39wy1c_4rglW6DQbOjcfwhU1o9V43vR5Qou5XQ2I4" name="google-site-verification"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/googletagmanager.js"></script><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
   direction: ltr;
 }
 
@@ -1052,26 +1052,26 @@ MySQL内部每秒能够扫描内存中上百万行数据，相比之下，MySQL�
 <p><strong>有时候对于一个大查询我们需要“分而治之”，将大查询切分成小查询，每个查询功能完全一样，只完成一小部分每次只返回一小部分查询结果。</strong></p>
 <p>删除旧的数据就是一个很好的例子。定期地清除大量数据时，如果用一个大的语句一次性完成的话，则可能需要一次锁住很多数据、占满整个事务日志、耗尽系统资源、阻塞很多小的但重要的查询。将一个大的DELETE语句切分成多个较小的查询可以尽可能小地影响MySQL性能，同时还可以减少MySQL复制的延迟。</p>
 <p>例如，我们需要每个月运行一次下面的查询：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> DELETE FROM messages WHERE created <
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; DELETE FROM messages WHERE created &lt;
 DATE_SUB(NOW(),INTERVAL 3 MONTH);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>那么可以用类似下面的办法来完成同样的工作：</p>
 <pre class="line-numbers language-shell"><code class="language-shell">rows_affected = 0
 do {
 rows_affected = do_query(
-    "DELETE FROM messages WHERE created < DATE_SUB(NOW(),INTERVAL 3 MONTH)LIMIT 10000 ")
-} while rows_affected > 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    "DELETE FROM messages WHERE created &lt; DATE_SUB(NOW(),INTERVAL 3 MONTH)LIMIT 10000 ")
+} while rows_affected &gt; 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>一次删除一万行数据一般来说是一个比较高效而且对服务器影响也最小的做法（如果是事务型引擎，很多时候小事务能够更高效）。同时，需要注意的是，如果每次删除数据后，都暂停一会儿再做下一次删除，这样也可以将服务器上原本一次性的压力分散到一个很长的时间段中，就可以大大降低对服务器的影响，还可以大大减少删除时锁的持有时间。</p>
 <h4 id="分解关联查询">分解关联查询</h4>
 <p><strong>很多高性能的应用都会对关联查询进行分解。简单地，可以对每一个表进行一次单表查询，然后将结果在应用程序中进行关联。</strong></p>
 <p>例如，下面这个查询：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT * FROM tag
-    -> JOIN tag_post ON tag_post.tag_id=tag.id
-    -> JOIN post ON tag_post.post_id=post.id
-    -> WHERE tag.tag='mysql';<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT * FROM tag
+    -&gt; JOIN tag_post ON tag_post.tag_id=tag.id
+    -&gt; JOIN post ON tag_post.post_id=post.id
+    -&gt; WHERE tag.tag='mysql';<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>可以分解成下面这些查询来代替：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT * FROM tag WHERE tag='mysql';
-mysql> SELECT * FROM tag_post WHERE tag_id=1234;
-mysql> SELECT * FROM post WHERE post.id in (123,456,567,9098,8904);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT * FROM tag WHERE tag='mysql';
+mysql&gt; SELECT * FROM tag_post WHERE tag_id=1234;
+mysql&gt; SELECT * FROM post WHERE post.id in (123,456,567,9098,8904);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p><strong>用分解关联查询的方式重构查询有如下的优势：</strong></p>
 <ul>
 <li><strong>让缓存的效率更高</strong>：许多应用程序可以方便地缓存单表查询对应的结果对象。例如，上面查询中的tag已经被缓存了，那么应用就可以跳过第一个查询。再例如，应用中已经缓存了ID为123、567、9098的内容，那么第三个查询的IN()
@@ -1236,20 +1236,20 @@ API ”的接口。查询中的每一个表由一个handler
 <h4 id="在同一个表上查询和更新">在同一个表上查询和更新</h4>
 <p>MySQL不允许对同一张表同时进行查询和更新。这其实并不是优化器的限制，如果清楚MySQL是如何执行查询的，就可以避免这种情况。</p>
 <p>下面是一个无法运行的SQL，虽然这是一个符合标准的SQL语句。这个SQL语句尝试将两个表中相似行的数量记录到字段cnt中：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> UPDATE tbl AS outer_tbl
-    -> SET cnt = (
-    -> SELECT count(*) FROM tbl AS inner_tbl-> WHERE inner_tbl.type = outer_tbl.type
-    -> );
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; UPDATE tbl AS outer_tbl
+    -&gt; SET cnt = (
+    -&gt; SELECT count(*) FROM tbl AS inner_tbl-&gt; WHERE inner_tbl.type = outer_tbl.type
+    -&gt; );
 ERROR 1093 (HY000): You can't specify target table 'outer_tbl' for update in FROM clause<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>可以通过使用生成表的形式来绕过上面的限制，因为MySQL只会把这个表当作一个临时表来处理。实际上，这执行了两个查询：一个是子查询中的SELECT语句，另一个是多表关联UPDATE
 ，只是关联的表是一个临时表。子查询会在UPDATE
 语句打开表之前就完成，所以下面的查询将会正常执行：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> UPDATE tbl
-    -> INNER JOIN(
-    -> SELECT type, count(*) AS cnt
-    -> FROM tbl-> GROUP BY type
-    -> ) AS der USING(type)
-    -> SET tbl.cnt = der.cnt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; UPDATE tbl
+    -&gt; INNER JOIN(
+    -&gt; SELECT type, count(*) AS cnt
+    -&gt; FROM tbl-&gt; GROUP BY type
+    -&gt; ) AS der USING(type)
+    -&gt; SET tbl.cnt = der.cnt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h3 id="查询优化器的提示hint">查询优化器的提示（hint）</h3>
 <p>如果对优化器选择的执行计划不满意，可以使用优化器提供的几个提示（hint）来控制最终的执行计划。下面将列举一些常见的提示，并简单地给出什么时候使用该提示。通过在查询中加入相应的提示，就可以控制该查询的执行计划。
 （关于每个提示的具体用法，建议直接阅读MySQL官方手册。有些提示和版本有直接关系。
@@ -1384,32 +1384,32 @@ LIMIT 1000,20
 <h5 id="延迟关联">延迟关联</h5>
 <p><strong>优化此类分页查询的一个最简单的办法就是尽可能地使用索引覆盖扫描，而不是查询所有的列。然后根据需要做一次关联操作再返回所需的列。</strong>对于偏移量很大的时候，这样做的效率会提升非常大。</p>
 <p>例如，考虑下面的查询：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT film_id, description FROM sakila.film ORDER BY title LIMIT 50, 5;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT film_id, description FROM sakila.film ORDER BY title LIMIT 50, 5;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>如果这个表非常大，那么这个查询最好改写成下面的样子：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT film.film_id, film.description
-    -> FROM sakila.film
-    ->  INNER JOIN (
-    ->    SELECT film_id FROM sakila.film
-    ->    ORDER BY title LIMIT 50, 5
-    ->  ) AS lim USING(film_id);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT film.film_id, film.description
+    -&gt; FROM sakila.film
+    -&gt;  INNER JOIN (
+    -&gt;    SELECT film_id FROM sakila.film
+    -&gt;    ORDER BY title LIMIT 50, 5
+    -&gt;  ) AS lim USING(film_id);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>这里的“延迟关联”将大大提升查询效率，它让MySQL扫描尽可能少的页面，获取需要访问的记录后再根据关联列回原表查询需要的所有列。</strong>这个技术也可以用于优化关联查询中的LIMIT
 子句。</p>
 <h5 id="范围扫描">范围扫描</h5>
 <p><strong>有时候也可以将 LIMIT
 查询转换为已知位置的查询，让MySQL通过范围扫描获得到对应的结果。</strong></p>
 <p>例如，如果在一个位置列上有索引，并且预先计算出了边界值，上面的查询就可以改写为：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT film_id, description FROM sakila.film
-    -> WHERE position BETWEEN 50 AND 54 ORDER BY position;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT film_id, description FROM sakila.film
+    -&gt; WHERE position BETWEEN 50 AND 54 ORDER BY position;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <h5 id="书签记录">书签记录</h5>
 <p><strong>LIMIT 和 OFFSET 的问题，其实是 OFFSET
 的问题，它会导致MySQL扫描大量不需要的行然后再抛弃掉。如果可以使用书签记录上次取数据的位置，那么下次就可以直接从该书签记录的位置开始扫描，这样就可以避免使用OFFSET</strong></p>
 <p>例如，若需要按照租借记录做翻页，那么可以根据最新一条租借记录向后追溯，这种做法可行是因为租借记录的主键是单调增长的。首先使用下面的查询获得第一组结果：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT * FROM sakila.rental
-    -> ORDER BY rental_id DESC LIMIT 20;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT * FROM sakila.rental
+    -&gt; ORDER BY rental_id DESC LIMIT 20;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>假设上面的查询返回的是主键为16049到16030的租借记录，那么下一页查询就可以从16030这个点开始：</p>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> SELECT * FROM sakila.rental
-    -> WHERE rental_id < 16030
-    -> ORDER BY rental_id DESC LIMIT 20;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; SELECT * FROM sakila.rental
+    -&gt; WHERE rental_id &lt; 16030
+    -&gt; ORDER BY rental_id DESC LIMIT 20;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>该技术的好处是无论翻页到多么后面，其性能都会很好。</p>
 <h5 id="其他优化办法">其他优化办法</h5>
 <p><strong>其他优化办法还包括使用预先计算的汇总表，或者关联到一个冗余表，冗余表只包含主键列和需要做排序的数据列。</strong></p>
@@ -1532,7 +1532,7 @@ NAMES UTF8
 <span class="token punctuation">}</span>
 <span class="token keyword">return</span> <span class="token variable">$name</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
-<span class="token delimiter">?></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token delimiter">?&gt;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h5 id="本地共享内存缓存">本地共享内存缓存</h5>
 <p>这种缓存一般是中等大小（几个GB），快速，难以在多台机器间同步。它们对小型的半静态位数据比较合适。例如每个州的城市列表，分片数据存储的分区函数（映射表），或者使用存活时间（TTL）策略进行失效的数据等。<strong>共享内存（可以在不同进程间访问）最大的好处是访问非常快——通常比其他任何远程缓存访问都要快不少。</strong></p>
 <h5 id="分布式内存缓存">分布式内存缓存</h5>
@@ -1630,7 +1630,7 @@ section增加如下参数。</p>
 <p>重启MySQL后会看到/var/lib/mysql/slow-query.log文件。</p>
 <p><strong>检查参数</strong></p>
 <p>通过如下命令可以检查上述参数配置情况。</p>
-<pre class="line-numbers language-shell"><code class="language-shell">mysql> show variables like 'slow_query%';
+<pre class="line-numbers language-shell"><code class="language-shell">mysql&gt; show variables like 'slow_query%';
 +---------------------+-------------------------------+
 | Variable_name       | Value                         |
 +---------------------+-------------------------------+
@@ -1639,7 +1639,7 @@ section增加如下参数。</p>
 +---------------------+-------------------------------+
 2 rows in set (0.00 sec)
 
-mysql> show variables like 'long_query_time';
+mysql&gt; show variables like 'long_query_time';
 +-----------------+----------+
 | Variable_name   | Value    |
 +-----------------+----------+
@@ -1699,7 +1699,7 @@ data</strong>：这表示多种情况，线程可能在多个状态之间传送�
 <p>当执行一次 WHERE 条件比较的成本。可以通过查询当前会话的
 Last_query_cost 的值来得知MySQL计算的当前查询的成本。</p>
 <h4 id="执行查询语句">执行查询语句</h4>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> select sql_no_cache count(*) from sakila.film_actor;
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; select sql_no_cache count(*) from sakila.film_actor;
 +----------+
 | count(*) |
 +----------+
@@ -1708,7 +1708,7 @@ Last_query_cost 的值来得知MySQL计算的当前查询的成本。</p>
 1 row in set, 1 warning (0.00 sec)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h4 id="执行-show-status-查看-last_query_cost">执行
 <code>show status</code> 查看 <code>Last_query_cost</code></h4>
-<pre class="line-numbers language-mysql"><code class="language-mysql">mysql> show status like 'Last_query_cost';
+<pre class="line-numbers language-mysql"><code class="language-mysql">mysql&gt; show status like 'Last_query_cost';
 +-----------------+-------------+
 | Variable_name   | Value       |
 +-----------------+-------------+

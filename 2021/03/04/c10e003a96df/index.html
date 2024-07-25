@@ -8,7 +8,7 @@
 参考文章-缓存更新策略
 参考文章-缓存底层原理
 概念
-缓存对高负载应用来说是至关重要的。一个典型的Web应用程序会提供大量的内容，直接生成这些内容的成本比采用缓存要高得多（包含检查和缓存超时的开销），所以采用缓存通常可以获得数量级的性能提升。诀窍是找到正确的粒度"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="缓存基础"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/googletagmanager.js"></script><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
+缓存对高负载应用来说是至关重要的。一个典型的Web应用程序会提供大量的内容，直接生成这些内容的成本比采用缓存要高得多（包含检查和缓存超时的开销），所以采用缓存通常可以获得数量级的性能提升。诀窍是找到正确的粒度"><meta name="twitter:site" content="风吹流年远"><meta name="twitter:title" content="缓存基础"><meta name="twitter:card" content="summary"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta content="Pv39wy1c_4rglW6DQbOjcfwhU1o9V43vR5Qou5XQ2I4" name="google-site-verification"><meta name="renderer" content="webkit"><link rel="short icon" href="images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/googletagmanager.js"></script><meta name="generator" content="Hexo 5.1.1"><style>mjx-container[jax="SVG"] {
   direction: ltr;
 }
 
@@ -354,11 +354,11 @@ O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key
 到节点的映射，通过 Key 就能以 O(1) 的时间得到节点，然后再以 O(1)
 的时间将其从双向队列中删除。</li>
 </ul>
-<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LRU</span><span class="token operator">&lt;</span>K<span class="token punctuation">,</span> V<span class="token operator">></span> <span class="token keyword">implements</span> <span class="token class-name">Iterable</span><span class="token operator">&lt;</span>K<span class="token operator">></span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LRU</span><span class="token operator">&lt;</span>K<span class="token punctuation">,</span> V<span class="token operator">&gt;</span> <span class="token keyword">implements</span> <span class="token class-name">Iterable</span><span class="token operator">&lt;</span>K<span class="token operator">&gt;</span> <span class="token punctuation">{</span>
 
     <span class="token keyword">private</span> Node head<span class="token punctuation">;</span>
     <span class="token keyword">private</span> Node tail<span class="token punctuation">;</span>
-    <span class="token keyword">private</span> HashMap<span class="token operator">&lt;</span>K<span class="token punctuation">,</span> Node<span class="token operator">></span> map<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> HashMap<span class="token operator">&lt;</span>K<span class="token punctuation">,</span> Node<span class="token operator">&gt;</span> map<span class="token punctuation">;</span>
     <span class="token keyword">private</span> <span class="token keyword">int</span> maxSize<span class="token punctuation">;</span>
 
     <span class="token keyword">private</span> <span class="token keyword">class</span> <span class="token class-name">Node</span> <span class="token punctuation">{</span>
@@ -378,7 +378,7 @@ O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key
     <span class="token keyword">public</span> <span class="token function">LRU</span><span class="token punctuation">(</span><span class="token keyword">int</span> maxSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
         <span class="token keyword">this</span><span class="token punctuation">.</span>maxSize <span class="token operator">=</span> maxSize<span class="token punctuation">;</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span>map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span>maxSize <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">/</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span>maxSize <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">/</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
         head <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
         tail <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -413,7 +413,7 @@ O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key
         map<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token function">appendHead</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> maxSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;</span> maxSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
             Node toRemove <span class="token operator">=</span> <span class="token function">removeTail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             map<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>toRemove<span class="token punctuation">.</span>k<span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
@@ -458,9 +458,9 @@ O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key
 
 
     <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">public</span> Iterator<span class="token operator">&lt;</span>K<span class="token operator">></span> <span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> Iterator<span class="token operator">&lt;</span>K<span class="token operator">&gt;</span> <span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Iterator</span><span class="token operator">&lt;</span>K<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Iterator</span><span class="token operator">&lt;</span>K<span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             <span class="token keyword">private</span> Node cur <span class="token operator">=</span> head<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
 
             <span class="token annotation punctuation">@Override</span>
